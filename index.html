@@ -3,63 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matematik Yarışı</title>
+    <title>Matematik Yarışı - Zorluk Seçimi</title>
     <style>
-        /* Genel Tasarım */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
             margin: 0; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: #333;
         }
 
-        /* Kart Yapısı */
         .container { 
-            background: white; 
+            background: rgba(255, 255, 255, 0.95); 
             padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            border-radius: 25px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); 
             text-align: center; 
-            width: 350px; 
+            width: 380px; 
         }
 
-        /* Menü Tasarımı */
+        /* Menü Ekranı */
         #menu-screen { display: block; }
         .menu-box {
-            background: #f8f9fa;
-            border: 3px solid #764ba2;
-            padding: 20px;
+            background: #fff;
+            border: 4px solid #1a2a6c;
+            padding: 15px;
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
-        .menu-box h1 { margin: 0; color: #764ba2; font-size: 24px; }
+        .menu-box h1 { margin: 0; color: #1a2a6c; font-size: 26px; text-transform: uppercase; }
 
-        /* Oyun Ekranı (Başlangıçta Gizli) */
-        #game-screen { display: none; }
-        
-        #question { font-size: 3rem; margin: 20px 0; font-weight: bold; }
-        input { 
-            width: 80%; padding: 12px; font-size: 1.5rem; 
-            border: 2px solid #ddd; border-radius: 10px; 
-            margin-bottom: 15px; text-align: center;
-        }
-
-        /* Butonlar */
+        /* Zorluk Butonları */
+        .difficulty-container { display: flex; flex-direction: column; gap: 10px; }
         .btn {
-            background: #4CAF50; color: white; border: none; 
-            padding: 15px 30px; font-size: 1.2rem; 
-            border-radius: 10px; cursor: pointer; transition: 0.2s;
-            width: 100%;
+            border: none; padding: 12px; font-size: 1.1rem; 
+            border-radius: 12px; cursor: pointer; transition: 0.3s;
+            font-weight: bold; color: white;
         }
-        .btn:hover { background: #45a049; transform: scale(1.02); }
+        .kolay { background: #2ecc71; }
+        .orta { background: #f1c40f; color: #333; }
+        .zor { background: #e67e22; }
+        .imkansiz { background: #c0392b; animation: pulse 1.5s infinite; }
 
-        .stats { display: flex; justify-content: space-around; margin-top: 20px; font-size: 1.1rem; }
-        .score-val { color: #4CAF50; font-weight: bold; }
-        .timer-val { color: #e74c3c; font-weight: bold; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(192, 57, 43, 0.5); }
+            100% { transform: scale(1); }
+        }
+
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        /* Oyun Ekranı */
+        #game-screen { display: none; }
+        #question { font-size: 3.5rem; margin: 15px 0; font-weight: bold; color: #2c3e50; }
+        input { 
+            width: 70%; padding: 15px; font-size: 1.8rem; 
+            border: 3px solid #ddd; border-radius: 15px; 
+            margin-bottom: 20px; text-align: center; outline: none;
+        }
+        .stats { display: flex; justify-content: space-around; font-size: 1.2rem; margin-top: 10px; }
+        #current-diff { font-style: italic; color: #7f8c8d; margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body>
@@ -69,18 +75,23 @@
         <div class="menu-box">
             <h1>MATEMATİK YARIŞI</h1>
         </div>
-        <p>Hızlı toplayan kazanır!</p>
-        <button class="btn" onclick="startGame()">YARIŞI BAŞLAT</button>
+        <p>Bir zorluk seviyesi seçin:</p>
+        <div class="difficulty-container">
+            <button class="btn kolay" onclick="startGame('kolay')">KOLAY (1-10)</button>
+            <button class="btn orta" onclick="startGame('orta')">ORTA (10-50)</button>
+            <button class="btn zor" onclick="startGame('zor')">ZOR (50-100)</button>
+            <button class="btn imkansiz" onclick="startGame('imkansiz')">İMKANSIZ (100-500)</button>
+        </div>
     </div>
 
     <div id="game-screen">
+        <span id="current-diff">Seviye: Kolay</span>
         <div id="question">0 + 0</div>
         <input type="number" id="answer" placeholder="?" autocomplete="off">
-        <button class="btn" onclick="checkAnswer()">CEVAPLA</button>
         
         <div class="stats">
-            <div>Puan: <span id="score" class="score-val">0</span></div>
-            <div>Süre: <span id="timer" class="timer-val">30</span>s</div>
+            <div>Skor: <span id="score" style="color:#27ae60">0</span></div>
+            <div>Süre: <span id="timer" style="color:#e74c3c">30</span>s</div>
         </div>
     </div>
 </div>
@@ -90,14 +101,25 @@
     let timeLeft = 30;
     let correctAnswer;
     let timerInterval;
+    let currentDifficulty = '';
 
-    function startGame() {
-        // Menüyü gizle, oyunu göster
+    const settings = {
+        'kolay': { max: 10, time: 30, label: 'Kolay' },
+        'orta': { max: 50, time: 25, label: 'Orta' },
+        'zor': { max: 100, time: 20, label: 'Zor' },
+        'imkansiz': { max: 500, time: 15, label: 'İMKANSIZ' }
+    };
+
+    function startGame(diff) {
+        currentDifficulty = diff;
+        const config = settings[diff];
+        
         document.getElementById('menu-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('current-diff').innerText = "Seviye: " + config.label;
         
         score = 0;
-        timeLeft = 30;
+        timeLeft = config.time;
         document.getElementById('score').innerText = score;
         document.getElementById('timer').innerText = timeLeft;
         
@@ -106,8 +128,10 @@
     }
 
     function generateQuestion() {
-        const num1 = Math.floor(Math.random() * 15) + 1;
-        const num2 = Math.floor(Math.random() * 15) + 1;
+        const maxNumber = settings[currentDifficulty].max;
+        const num1 = Math.floor(Math.random() * maxNumber) + 1;
+        const num2 = Math.floor(Math.random() * maxNumber) + 1;
+        
         correctAnswer = num1 + num2;
         document.getElementById('question').innerText = `${num1} + ${num2}`;
         document.getElementById('answer').value = '';
@@ -119,19 +143,17 @@
         const userAnswer = parseInt(inputField.value);
         
         if (userAnswer === correctAnswer) {
-            score += 10;
+            score += (currentDifficulty === 'imkansiz' ? 50 : 10);
             document.getElementById('score').innerText = score;
             generateQuestion();
-        } else {
-            // Yanlış cevapta hafif bir sallanma efekti verilebilir (opsiyonel)
-            inputField.style.borderColor = 'red';
-            setTimeout(() => inputField.style.borderColor = '#ddd', 500);
         }
     }
 
-    // Enter tuşu desteği
-    document.getElementById('answer').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkAnswer();
+    // Her tuş basımında kontrol et (Enter'a basmaya gerek kalmasın, daha hızlı olur)
+    document.getElementById('answer').addEventListener('input', function() {
+        if (parseInt(this.value) === correctAnswer) {
+            checkAnswer();
+        }
     });
 
     function startTimer() {
@@ -141,8 +163,7 @@
             
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
-                alert("Süre bitti! Skorun: " + score);
-                // Oyunu bitince menüye dön
+                alert(`Oyun Bitti!\nZorluk: ${settings[currentDifficulty].label}\nToplam Skor: ${score}`);
                 document.getElementById('game-screen').style.display = 'none';
                 document.getElementById('menu-screen').style.display = 'block';
             }
