@@ -3,61 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox UI Studio v1.7 - Test Mode</title>
+    <title>Roblox UI Studio v1.8 - Layer Master</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* PANELS */
-        .sidebar, .properties { width: 300px; background: var(--panel); border: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; z-index: 100; transition: transform 0.3s; }
-        .test-mode-active .sidebar, .test-mode-active .properties { transform: translateX(-350px); } /* Sol paneli gizle */
-        .test-mode-active .properties { transform: translateX(350px); } /* Sağ paneli gizle */
+        .sidebar, .properties { width: 300px; background: var(--panel); border: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; z-index: 100; transition: 0.3s; }
+        .test-mode-active .sidebar, .test-mode-active .properties { transform: translateX(-350px); }
+        .test-mode-active .properties { transform: translateX(350px); }
 
-        /* WORKSPACE */
-        .workspace { flex-grow: 1; background-color: #111; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 30px 30px; position: relative; overflow: auto; display: flex; justify-content: center; align-items: center; transition: all 0.3s; }
-        .test-mode-active .workspace { padding: 0; background: #000; }
-        
-        .roblox-screen { 
-            width: 1280px; height: 720px; background: #000; border: 4px solid #444; position: relative; flex-shrink: 0; box-shadow: 0 0 100px rgba(0,0,0,0.8); overflow: hidden;
-        }
+        .workspace { flex-grow: 1; background-color: #111; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 30px 30px; position: relative; overflow: auto; display: flex; justify-content: center; align-items: center; }
+        .roblox-screen { width: 1280px; height: 720px; background: #000; border: 4px solid #444; position: relative; flex-shrink: 0; overflow: hidden; }
         .test-mode-active .roblox-screen { border: none; width: 100vw; height: 100vh; }
 
-        /* ELEMENTS */
-        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: grab; box-sizing: border-box; overflow: hidden; transition: transform 0.1s; }
+        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: grab; box-sizing: border-box; overflow: hidden; }
         .ui-element.selected { outline: 2px solid var(--primary); outline-offset: 4px; }
-        .test-mode-active .ui-element { cursor: default; }
-        .test-mode-active .ui-element:active { transform: scale(0.95); } /* Tıklama efekti */
 
-        .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); z-index: 10; }
-        .test-mode-active .resizer { display: none; }
+        .layer-item { background: #252525; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid transparent; font-size: 0.85rem; }
+        .layer-item:hover { border-color: var(--primary); }
+        .layer-item.active { background: var(--primary); color: white; }
 
+        .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); }
+        .btn-stop { background: #e74c3c; color: white; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; display: none; font-weight: bold; }
+        .test-mode-active .btn-stop { display: block; }
+        
         .prop-group { margin-bottom: 8px; }
         .prop-group label { display: block; font-size: 0.7rem; color: #aaa; margin-bottom: 3px; }
-        input, select { width: 100%; background: #252525; border: 1px solid #444; color: white; padding: 7px; border-radius: 5px; box-sizing: border-box; font-size: 0.8rem; }
-
-        /* BUTTONS */
-        .btn-play { background: #f1c40f; color: #000; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        .btn-stop { background: #e74c3c; color: white; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; display: none; font-weight: bold; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .test-mode-active .btn-stop { display: block; }
-        .btn-green { background: #2ecc71; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        input, select { width: 100%; background: #252525; border: 1px solid #444; color: white; padding: 7px; border-radius: 5px; box-sizing: border-box; }
+        
+        .tool-btn { background: #333; color: white; border: 1px solid #444; padding: 8px; cursor: pointer; text-align: left; border-radius: 4px; }
     </style>
 </head>
 <body id="main-body">
 
     <div class="sidebar">
-        <button class="btn-play" onclick="toggleTestMode(true)">▶ OYUNU BAŞLAT (TEST)</button>
+        <button onclick="toggleTestMode(true)" style="background:#f1c40f; color:black; padding:10px; border-radius:6px; font-weight:bold; border:none; cursor:pointer;">▶ TEST MODU</button>
         <h3>Elementler</h3>
-        <button onclick="addElement('Frame')" style="background:#333; color:white; border:1px solid #444; padding:8px; cursor:pointer; text-align:left; border-radius:4px;">🖼️ Frame</button>
-        <button onclick="addElement('TextButton')" style="background:#333; color:white; border:1px solid #444; padding:8px; cursor:pointer; text-align:left; border-radius:4px;">🔘 Button</button>
-        <button onclick="addElement('ImageLabel')" style="background:#333; color:white; border:1px solid #444; padding:8px; cursor:pointer; text-align:left; border-radius:4px;">🖼️ Icon</button>
-        
-        <div style="margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
-            <h3>Kayıtlar</h3>
-            <input type="text" id="save-name" placeholder="Proje Adı...">
-            <button onclick="saveProject()" style="width:100%; margin-top:5px; background:var(--primary); color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;">💾 KAYDET</button>
-            <select id="load-select" style="margin-top:5px;"></select>
-            <button onclick="loadProject()" style="width:100%; margin-top:5px; background:#8e44ad; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;">📂 YÜKLE</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+            <button class="tool-btn" onclick="addElement('Frame')">🖼️ Frame</button>
+            <button class="tool-btn" onclick="addElement('TextButton')">🔘 Buton</button>
         </div>
+
+        <h3 style="margin-top:20px;">Katmanlar (Z-Index)</h3>
+        <div id="layer-list" style="display:flex; flex-direction:column; gap:5px;"></div>
     </div>
 
     <button class="btn-stop" onclick="toggleTestMode(false)">⏹ TESTİ BİTİR</button>
@@ -70,33 +58,27 @@
         <h3>Özellikler</h3>
         <div id="prop-inputs" style="display:none;">
             <div class="prop-group"><label>Element İsmi</label><input type="text" id="p-name" oninput="apply()"></div>
-            
-            <div style="background:#222; padding:10px; border-radius:8px; margin-bottom:10px;">
-                <label style="font-size:0.7rem; color:var(--primary)">METİN AYARLARI</label>
-                <div class="prop-group"><label>Metin İçeriği</label><input type="text" id="p-text" oninput="apply()"></div>
-                <div class="prop-group"><label>Metin Rengi</label><input type="color" id="p-tcolor" oninput="apply()"></div>
-                <div class="prop-group"><label>Metin Boyutu</label><input type="number" id="p-tsize" oninput="apply()"></div>
-            </div>
-
-            <div class="prop-group"><label>Image ID</label><input type="text" id="p-icon" oninput="apply()"></div>
+            <div class="prop-group"><label>Metin</label><input type="text" id="p-text" oninput="apply()"></div>
             <div class="prop-group">
-                <label>Arka Plan Gradient</label>
+                <label>Renkler</label>
                 <div style="display:flex; gap:5px;"><input type="color" id="p-c1" oninput="apply()"><input type="color" id="p-c2" oninput="apply()"></div>
             </div>
-            <div class="prop-group">
-                <label>Boyut (Genişlik x Yükseklik)</label>
-                <div style="display:flex; gap:5px;"><input type="number" id="p-w" oninput="apply()"><input type="number" id="p-h" oninput="apply()"></div>
-            </div>
-            <div class="prop-group"><label>Köşe Yuvarlaklığı</label><input type="range" id="p-radius" min="0" max="100" oninput="apply()"></div>
             <div class="prop-group">
                 <label>Davranış (Script)</label>
                 <select id="p-script" onchange="apply()">
                     <option value="none">Hiçbiri</option>
-                    <option value="print">Konsola Yazdır</option>
-                    <option value="close">Menüyü Kapat</option>
+                    <option value="open">Menüyü Aç</option>
+                    <option value="close">GUI Kapat</option>
                 </select>
             </div>
-            <button class="btn-green" style="width:100%; margin-top:10px;" onclick="exportLua()">📥 LUA KODUNU İNDİR</button>
+            <div id="target-selection" class="prop-group" style="display:none; background:#222; padding:10px; border-radius:6px;">
+                <label>Açılacak Hedef Frame</label>
+                <select id="p-target" onchange="apply()"></select>
+            </div>
+            <div class="prop-group"><label>Z-Index (Katman Sırası)</label><input type="number" id="p-z" oninput="apply()"></div>
+            <div class="prop-group"><label>Köşe Yuvarlaklığı</label><input type="range" id="p-radius" min="0" max="100" oninput="apply()"></div>
+            
+            <button onclick="exportLua()" style="background:#2ecc71; color:white; border:none; padding:12px; border-radius:6px; width:100%; font-weight:bold; cursor:pointer; margin-top:10px;">📥 LUA İNDİR</button>
             <button onclick="deleteSelected()" style="background:#e74c3c; color:white; border:none; width:100%; padding:8px; border-radius:4px; margin-top:10px; cursor:pointer;">🗑️ SİL</button>
         </div>
     </div>
@@ -105,13 +87,13 @@
     let elements = [];
     let selectedId = null;
     let isTestMode = false;
-    const view = document.getElementById('viewport');
 
     function toggleTestMode(val) {
         isTestMode = val;
         select(null);
         if(val) document.body.classList.add('test-mode-active');
         else document.body.classList.remove('test-mode-active');
+        render();
     }
 
     function addElement(type) {
@@ -119,33 +101,30 @@
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
             text: type === 'Frame' ? '' : 'Buton',
-            tColor: '#ffffff', tSize: 18,
-            icon: type === 'ImageLabel' ? '6031075929' : '', 
-            c1: "#2a2a2a", c2: "#1a1a1a",
+            c1: "#00a2ff", c2: "#0055ff",
             w: 200, h: 60, x: 100, y: 100, radius: 10, z: elements.length + 1,
-            scriptType: 'none'
+            scriptType: 'none', targetId: ''
         });
         select(id);
     }
 
     function render() {
+        const view = document.getElementById('viewport');
+        const layers = document.getElementById('layer-list');
         view.innerHTML = '';
+        layers.innerHTML = '';
+
+        // Z-Index'e göre sırala
+        elements.sort((a,b) => a.z - b.z);
+
         elements.forEach(el => {
+            // VIEWPORT RENDER
             const div = document.createElement('div');
             div.className = `ui-element ${selectedId === el.id ? 'selected' : ''}`;
-            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; border-radius:${el.radius}px; background:linear-gradient(180deg, ${el.c1}, ${el.c2}); color:${el.tColor}; font-size:${el.tSize}px;`;
+            div.id = el.id;
+            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; border-radius:${el.radius}px; background:linear-gradient(180deg, ${el.c1}, ${el.c2});`;
+            div.innerHTML = `<span>${el.text}</span>`;
             
-            if(el.icon) {
-                const img = document.createElement('img');
-                img.src = `https://www.roblox.com/asset-thumbnail/image?assetId=${el.icon}&width=420&height=420&format=png`;
-                img.style = "width:70%; height:70%; object-fit:contain; pointer-events:none;";
-                div.appendChild(img);
-            }
-
-            const textSpan = document.createElement('span');
-            textSpan.innerText = el.text;
-            div.appendChild(textSpan);
-
             if(!isTestMode) {
                 const resizer = document.createElement('div');
                 resizer.className = 'resizer';
@@ -154,35 +133,52 @@
                 div.onmousedown = (e) => { e.stopPropagation(); if(e.target === div || e.target.tagName === 'SPAN') startDrag(e, el); };
                 div.onclick = (e) => { e.stopPropagation(); select(el.id); };
             } else {
-                // Test Modu Tıklama Olayları
-                div.onclick = () => {
-                    if(el.scriptType === 'print') console.log("%c[Roblox Test] %cButona tıklandı: " + el.name, "color: #f1c40f", "color: #fff");
-                    if(el.scriptType === 'close') alert("Script: Menü Kapatıldı!");
-                };
+                // TEST MODU MANTIĞI
+                if(el.scriptType === 'open') {
+                    div.onclick = () => {
+                        const target = document.getElementById(el.targetId);
+                        if(target) target.style.display = target.style.display === 'none' ? 'flex' : 'none';
+                    };
+                }
+                if(el.scriptType === 'close') div.onclick = () => alert("GUI Kapatıldı!");
             }
             view.appendChild(div);
+
+            // LAYER LIST RENDER
+            const layer = document.createElement('div');
+            layer.className = `layer-item ${selectedId === el.id ? 'active' : ''}`;
+            layer.innerHTML = `<span>${el.name}</span> <small>Z:${el.z}</small>`;
+            layer.onclick = () => select(el.id);
+            layers.insertBefore(layer, layers.firstChild); // En üstteki en önde
         });
-        updateLoadList();
     }
 
     function select(id) {
-        if(isTestMode) return;
         selectedId = id;
         const el = elements.find(e => e.id === id);
         const inputs = document.getElementById('prop-inputs');
+        const targetDiv = document.getElementById('target-selection');
+        const targetSelect = document.getElementById('p-target');
+
         if(el) {
             inputs.style.display = 'block';
             document.getElementById('p-name').value = el.name;
             document.getElementById('p-text').value = el.text;
-            document.getElementById('p-tcolor').value = el.tColor;
-            document.getElementById('p-tsize').value = el.tSize;
-            document.getElementById('p-icon').value = el.icon;
             document.getElementById('p-c1').value = el.c1;
             document.getElementById('p-c2').value = el.c2;
-            document.getElementById('p-w').value = el.w;
-            document.getElementById('p-h').value = el.h;
+            document.getElementById('p-z').value = el.z;
             document.getElementById('p-radius').value = el.radius;
             document.getElementById('p-script').value = el.scriptType;
+
+            if(el.scriptType === 'open') {
+                targetDiv.style.display = 'block';
+                targetSelect.innerHTML = '<option value="">Frame Seçin...</option>';
+                elements.filter(e => e.type === 'Frame').forEach(f => {
+                    targetSelect.innerHTML += `<option value="${f.id}" ${el.targetId === f.id ? 'selected' : ''}>${f.name}</option>`;
+                });
+            } else {
+                targetDiv.style.display = 'none';
+            }
         } else {
             inputs.style.display = 'none';
         }
@@ -194,23 +190,20 @@
         if(!el) return;
         el.name = document.getElementById('p-name').value;
         el.text = document.getElementById('p-text').value;
-        el.tColor = document.getElementById('p-tcolor').value;
-        el.tSize = parseInt(document.getElementById('p-tsize').value);
-        el.icon = document.getElementById('p-icon').value;
         el.c1 = document.getElementById('p-c1').value;
         el.c2 = document.getElementById('p-c2').value;
-        el.w = parseInt(document.getElementById('p-w').value);
-        el.h = parseInt(document.getElementById('p-h').value);
+        el.z = parseInt(document.getElementById('p-z').value) || 0;
         el.radius = document.getElementById('p-radius').value;
         el.scriptType = document.getElementById('p-script').value;
+        el.targetId = document.getElementById('p-target').value;
         render();
     }
 
     function startDrag(e, el) {
         let ox = e.clientX - el.x, oy = e.clientY - el.y;
         const move = (e) => {
-            el.x = Math.max(0, Math.min(e.clientX - ox, view.offsetWidth - el.w));
-            el.y = Math.max(0, Math.min(e.clientY - oy, view.offsetHeight - el.h));
+            el.x = e.clientX - ox;
+            el.y = e.clientY - oy;
             render();
         };
         const stop = () => document.removeEventListener('mousemove', move);
@@ -221,41 +214,14 @@
     function startResize(e, el) {
         e.stopPropagation();
         const move = (e) => {
-            const rect = view.getBoundingClientRect();
-            el.w = Math.max(30, Math.min(e.clientX - (el.x + rect.left), view.offsetWidth - el.x));
-            el.h = Math.max(20, Math.min(e.clientY - (el.y + rect.top), view.offsetHeight - el.y));
+            const rect = document.getElementById('viewport').getBoundingClientRect();
+            el.w = e.clientX - (el.x + rect.left);
+            el.h = e.clientY - (el.y + rect.top);
             render();
         };
         const stop = () => document.removeEventListener('mousemove', move);
         document.addEventListener('mousemove', move);
         document.addEventListener('mouseup', stop);
-    }
-
-    function saveProject() {
-        const name = document.getElementById('save-name').value;
-        if(!name) return;
-        localStorage.setItem("rbx_v17_" + name, JSON.stringify(elements));
-        updateLoadList();
-    }
-
-    function loadProject() {
-        const val = document.getElementById('load-select').value;
-        if(!val) return;
-        elements = JSON.parse(localStorage.getItem(val));
-        select(null);
-    }
-
-    function updateLoadList() {
-        const sel = document.getElementById('load-select');
-        sel.innerHTML = '';
-        for(let i=0; i<localStorage.length; i++){
-            let key = localStorage.key(i);
-            if(key.startsWith("rbx_v17_")){
-                let opt = document.createElement('option');
-                opt.value = key; opt.innerText = key.replace("rbx_v17_","");
-                sel.appendChild(opt);
-            }
-        }
     }
 
     function deleteSelected() {
@@ -264,22 +230,19 @@
     }
 
     function exportLua() {
-        let code = `-- Roblox UI v1.7 Pro\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))\nsg.IgnoreGuiInset = true\n`;
+        let code = `-- Roblox UI v1.8 Pro\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))\nsg.IgnoreGuiInset = true\n`;
         elements.forEach(el => {
-            const r = parseInt(el.tColor.substr(1,2), 16)/255, g = parseInt(el.tColor.substr(3,2), 16)/255, b = parseInt(el.tColor.substr(5,2), 16)/255;
-            code += `\n-- [[ ${el.name} ]]\nlocal ${el.id} = Instance.new("${el.type}", sg)\n${el.id}.Size = UDim2.new(0, ${el.w}, 0, ${el.h})\n${el.id}.Position = UDim2.new(0, ${el.x}, 0, ${el.y})\n${el.id}.BackgroundColor3 = Color3.new(1,1,1)\n`;
-            if(el.type !== 'Frame'){
-                code += `${el.id}.Text = "${el.text}"\n${el.id}.TextColor3 = Color3.new(${r.toFixed(2)},${g.toFixed(2)},${b.toFixed(2)})\n${el.id}.TextSize = ${el.tsize}\n${el.id}.Font = Enum.Font.GothamBold\n`;
+            code += `\nlocal ${el.id} = Instance.new("${el.type}", sg)\n${el.id}.Name = "${el.name}"\n${el.id}.Size = UDim2.new(0, ${el.w}, 0, ${el.h})\n${el.id}.Position = UDim2.new(0, ${el.x}, 0, ${el.y})\n${el.id}.ZIndex = ${el.z}\n`;
+            if(el.type !== 'Frame') code += `${el.id}.Text = "${el.text}"\n`;
+            if(el.scriptType === 'open' && el.targetId) {
+                code += `${el.id}.Activated:Connect(function() sg:FindFirstChild("${elements.find(e=>e.id===el.targetId).name}").Visible = not sg:FindFirstChild("${elements.find(e=>e.id===el.targetId).name}").Visible end)\n`;
             }
-            if(el.scriptType === 'print') code += `${el.id}.MouseButton1Click:Connect(function() print("Tıklandı: ${el.name}") end)\n`;
-            if(el.scriptType === 'close') code += `${el.id}.MouseButton1Click:Connect(function() sg:Destroy() end)\n`;
-            code += `local c = Instance.new("UICorner", ${el.id}); c.CornerRadius = UDim.new(0, ${el.radius}); c.Parent = ${el.id}\n`;
         });
-        const blob = new Blob([code], {type:'text/plain'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'RobloxStudioPro.txt'; a.click();
+        alert("LUA Kodu Kopyalandı/Hazır!");
+        console.log(code);
     }
 
-    updateLoadList();
+    render();
 </script>
 </body>
 </html>
