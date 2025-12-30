@@ -2,97 +2,127 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox UI Studio v1.8 - Layer Master</title>
+    <title>Roblox UI Expert Studio v1.9</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        .sidebar, .properties { width: 300px; background: var(--panel); border: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; z-index: 100; transition: 0.3s; }
-        .test-mode-active .sidebar, .test-mode-active .properties { transform: translateX(-350px); }
-        .test-mode-active .properties { transform: translateX(350px); }
+        .sidebar, .properties { width: 320px; background: var(--panel); border: 1px solid var(--border); padding: 15px; overflow-y: auto; z-index: 100; transition: 0.3s; }
+        .test-mode-active .sidebar, .test-mode-active .properties { transform: scale(0); width: 0; padding: 0; border: none; }
 
-        .workspace { flex-grow: 1; background-color: #111; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 30px 30px; position: relative; overflow: auto; display: flex; justify-content: center; align-items: center; }
-        .roblox-screen { width: 1280px; height: 720px; background: #000; border: 4px solid #444; position: relative; flex-shrink: 0; overflow: hidden; }
-        .test-mode-active .roblox-screen { border: none; width: 100vw; height: 100vh; }
+        .workspace { flex-grow: 1; background-color: #111; position: relative; overflow: auto; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.3s; }
+        
+        /* CİHAZ SEÇİCİ */
+        .device-selector { margin-bottom: 10px; display: flex; gap: 10px; z-index: 200; }
+        .device-btn { background: #333; color: white; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+        .device-btn.active { background: var(--primary); border-color: white; }
 
-        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: grab; box-sizing: border-box; overflow: hidden; }
+        .roblox-screen { 
+            background: #000; border: 4px solid #444; position: relative; overflow: hidden; 
+            transition: width 0.4s, height 0.4s; box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; box-sizing: border-box; transition: transform 0.1s, background 0.2s; }
         .ui-element.selected { outline: 2px solid var(--primary); outline-offset: 4px; }
-
-        .layer-item { background: #252525; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid transparent; font-size: 0.85rem; }
-        .layer-item:hover { border-color: var(--primary); }
-        .layer-item.active { background: var(--primary); color: white; }
+        
+        /* HOVER & CLICK */
+        .test-mode-active .ui-element:hover { filter: brightness(1.2); cursor: pointer; }
+        .test-mode-active .ui-element:active { transform: scale(0.92) !important; }
 
         .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); }
-        .btn-stop { background: #e74c3c; color: white; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; display: none; font-weight: bold; }
+        .btn-stop { background: #e74c3c; color: white; position: absolute; top: 20px; z-index: 1000; padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; display: none; font-weight: bold; }
         .test-mode-active .btn-stop { display: block; }
-        
-        .prop-group { margin-bottom: 8px; }
-        .prop-group label { display: block; font-size: 0.7rem; color: #aaa; margin-bottom: 3px; }
-        input, select { width: 100%; background: #252525; border: 1px solid #444; color: white; padding: 7px; border-radius: 5px; box-sizing: border-box; }
-        
-        .tool-btn { background: #333; color: white; border: 1px solid #444; padding: 8px; cursor: pointer; text-align: left; border-radius: 4px; }
+
+        .prop-group { margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+        .prop-group label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 5px; }
+        input, select { width: 100%; background: #222; border: 1px solid #444; color: white; padding: 8px; border-radius: 5px; }
     </style>
 </head>
-<body id="main-body">
+<body>
 
     <div class="sidebar">
-        <button onclick="toggleTestMode(true)" style="background:#f1c40f; color:black; padding:10px; border-radius:6px; font-weight:bold; border:none; cursor:pointer;">▶ TEST MODU</button>
+        <button onclick="toggleTestMode(true)" style="background:#f1c40f; color:black; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; border:none; margin-bottom:15px;">▶ TEST MODU (OYUNU BAŞLAT)</button>
+        
         <h3>Elementler</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-            <button class="tool-btn" onclick="addElement('Frame')">🖼️ Frame</button>
-            <button class="tool-btn" onclick="addElement('TextButton')">🔘 Buton</button>
+            <button onclick="addElement('Frame')" style="padding:10px; cursor:pointer; background:#333; color:white; border:none; border-radius:4px;">🖼️ Frame</button>
+            <button onclick="addElement('TextButton')" style="padding:10px; cursor:pointer; background:#333; color:white; border:none; border-radius:4px;">🔘 Buton</button>
         </div>
 
-        <h3 style="margin-top:20px;">Katmanlar (Z-Index)</h3>
+        <h3 style="margin-top:20px;">Katman Listesi</h3>
         <div id="layer-list" style="display:flex; flex-direction:column; gap:5px;"></div>
     </div>
 
-    <button class="btn-stop" onclick="toggleTestMode(false)">⏹ TESTİ BİTİR</button>
+    <button class="btn-stop" onclick="toggleTestMode(false)">⏹ DÜZENLEMEYE DÖN</button>
 
     <div class="workspace" onclick="select(null)">
+        <div class="device-selector" id="dev-sel">
+            <button class="device-btn active" onclick="setDevice(1280, 720, this)">🖥️ PC (1280x720)</button>
+            <button class="device-btn" onclick="setDevice(844, 390, this)">📱 iPhone 13</button>
+            <button class="device-btn" onclick="setDevice(1024, 768, this)">📟 iPad</button>
+        </div>
         <div class="roblox-screen" id="viewport" onclick="event.stopPropagation()"></div>
     </div>
 
     <div class="properties">
         <h3>Özellikler</h3>
         <div id="prop-inputs" style="display:none;">
-            <div class="prop-group"><label>Element İsmi</label><input type="text" id="p-name" oninput="apply()"></div>
-            <div class="prop-group"><label>Metin</label><input type="text" id="p-text" oninput="apply()"></div>
             <div class="prop-group">
-                <label>Renkler</label>
-                <div style="display:flex; gap:5px;"><input type="color" id="p-c1" oninput="apply()"><input type="color" id="p-c2" oninput="apply()"></div>
-            </div>
-            <div class="prop-group">
-                <label>Davranış (Script)</label>
-                <select id="p-script" onchange="apply()">
-                    <option value="none">Hiçbiri</option>
-                    <option value="open">Menüyü Aç</option>
-                    <option value="close">GUI Kapat</option>
+                <label>Görünüm (Font)</label>
+                <select id="p-font" onchange="apply()">
+                    <option value="'Inter', sans-serif">Default</option>
+                    <option value="'Fredoka One', cursive">Fredoka One (Cartoon)</option>
+                    <option value="'Luckiest Guy', cursive">Luckiest Guy (UI)</option>
+                    <option value="'Courier New', monospace">Code (Monospace)</option>
                 </select>
             </div>
-            <div id="target-selection" class="prop-group" style="display:none; background:#222; padding:10px; border-radius:6px;">
-                <label>Açılacak Hedef Frame</label>
-                <select id="p-target" onchange="apply()"></select>
+            <div class="prop-group">
+                <label>Metin ve Renk</label>
+                <input type="text" id="p-text" placeholder="Buton Yazısı" oninput="apply()">
+                <div style="display:flex; gap:5px; margin-top:5px;">
+                    <input type="color" id="p-tcolor" oninput="apply()" title="Yazı Rengi">
+                    <input type="color" id="p-c1" oninput="apply()" title="Zemin Renk 1">
+                    <input type="color" id="p-c2" oninput="apply()" title="Zemin Renk 2">
+                </div>
             </div>
-            <div class="prop-group"><label>Z-Index (Katman Sırası)</label><input type="number" id="p-z" oninput="apply()"></div>
-            <div class="prop-group"><label>Köşe Yuvarlaklığı</label><input type="range" id="p-radius" min="0" max="100" oninput="apply()"></div>
-            
-            <button onclick="exportLua()" style="background:#2ecc71; color:white; border:none; padding:12px; border-radius:6px; width:100%; font-weight:bold; cursor:pointer; margin-top:10px;">📥 LUA İNDİR</button>
-            <button onclick="deleteSelected()" style="background:#e74c3c; color:white; border:none; width:100%; padding:8px; border-radius:4px; margin-top:10px; cursor:pointer;">🗑️ SİL</button>
+            <div class="prop-group">
+                <label>Efektler (Hover)</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="p-hover" onchange="apply()" style="width:20px;"> 
+                    <span style="font-size:0.8rem;">Hover Parlama Aktif</span>
+                </div>
+            </div>
+            <div class="prop-group">
+                <label>Z-Index & Köşe</label>
+                <input type="number" id="p-z" oninput="apply()" placeholder="Z-Index">
+                <input type="range" id="p-radius" min="0" max="100" oninput="apply()" style="margin-top:10px;">
+            </div>
+            <button onclick="exportLua()" style="background:#2ecc71; color:white; border:none; padding:15px; border-radius:8px; width:100%; font-weight:bold; cursor:pointer;">📥 LUA KODUNU AL</button>
+            <button onclick="deleteSelected()" style="background:#e74c3c; color:white; border:none; width:100%; padding:8px; border-radius:4px; margin-top:10px; cursor:pointer;">🗑️ ELEMENTİ SİL</button>
         </div>
     </div>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Luckiest+Guy&display=swap" rel="stylesheet">
 
 <script>
     let elements = [];
     let selectedId = null;
     let isTestMode = false;
+    const view = document.getElementById('viewport');
+
+    function setDevice(w, h, btn) {
+        view.style.width = w + "px";
+        view.style.height = h + "px";
+        document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        render();
+    }
 
     function toggleTestMode(val) {
         isTestMode = val;
         select(null);
-        if(val) document.body.classList.add('test-mode-active');
-        else document.body.classList.remove('test-mode-active');
+        document.body.classList.toggle('test-mode-active', val);
+        document.getElementById('dev-sel').style.display = val ? 'none' : 'flex';
         render();
     }
 
@@ -100,29 +130,24 @@
         let id = "el_" + Date.now();
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
-            text: type === 'Frame' ? '' : 'Buton',
-            c1: "#00a2ff", c2: "#0055ff",
-            w: 200, h: 60, x: 100, y: 100, radius: 10, z: elements.length + 1,
-            scriptType: 'none', targetId: ''
+            text: type === 'Frame' ? '' : 'BUTON',
+            font: "'Inter', sans-serif",
+            tColor: '#ffffff', c1: "#00a2ff", c2: "#0055ff",
+            w: 180, h: 50, x: 50, y: 50, radius: 10, z: elements.length + 1,
+            hoverEffect: true
         });
         select(id);
     }
 
     function render() {
-        const view = document.getElementById('viewport');
-        const layers = document.getElementById('layer-list');
         view.innerHTML = '';
+        const layers = document.getElementById('layer-list');
         layers.innerHTML = '';
 
-        // Z-Index'e göre sırala
-        elements.sort((a,b) => a.z - b.z);
-
-        elements.forEach(el => {
-            // VIEWPORT RENDER
+        elements.sort((a,b) => a.z - b.z).forEach(el => {
             const div = document.createElement('div');
             div.className = `ui-element ${selectedId === el.id ? 'selected' : ''}`;
-            div.id = el.id;
-            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; border-radius:${el.radius}px; background:linear-gradient(180deg, ${el.c1}, ${el.c2});`;
+            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; border-radius:${el.radius}px; background:linear-gradient(180deg, ${el.c1}, ${el.c2}); color:${el.tColor}; font-family:${el.font};`;
             div.innerHTML = `<span>${el.text}</span>`;
             
             if(!isTestMode) {
@@ -130,55 +155,36 @@
                 resizer.className = 'resizer';
                 resizer.onmousedown = (e) => startResize(e, el);
                 div.appendChild(resizer);
-                div.onmousedown = (e) => { e.stopPropagation(); if(e.target === div || e.target.tagName === 'SPAN') startDrag(e, el); };
+                div.onmousedown = (e) => { e.stopPropagation(); startDrag(e, el); };
                 div.onclick = (e) => { e.stopPropagation(); select(el.id); };
-            } else {
-                // TEST MODU MANTIĞI
-                if(el.scriptType === 'open') {
-                    div.onclick = () => {
-                        const target = document.getElementById(el.targetId);
-                        if(target) target.style.display = target.style.display === 'none' ? 'flex' : 'none';
-                    };
-                }
-                if(el.scriptType === 'close') div.onclick = () => alert("GUI Kapatıldı!");
             }
+
             view.appendChild(div);
 
-            // LAYER LIST RENDER
             const layer = document.createElement('div');
-            layer.className = `layer-item ${selectedId === el.id ? 'active' : ''}`;
-            layer.innerHTML = `<span>${el.name}</span> <small>Z:${el.z}</small>`;
+            layer.style = `background:#252525; padding:8px; border-radius:4px; font-size:0.8rem; cursor:pointer; border:1px solid ${selectedId === el.id ? 'var(--primary)' : 'transparent'}`;
+            layer.innerText = el.name;
             layer.onclick = () => select(el.id);
-            layers.insertBefore(layer, layers.firstChild); // En üstteki en önde
+            layers.insertBefore(layer, layers.firstChild);
         });
     }
 
     function select(id) {
+        if(isTestMode) return;
         selectedId = id;
         const el = elements.find(e => e.id === id);
         const inputs = document.getElementById('prop-inputs');
-        const targetDiv = document.getElementById('target-selection');
-        const targetSelect = document.getElementById('p-target');
-
         if(el) {
             inputs.style.display = 'block';
             document.getElementById('p-name').value = el.name;
             document.getElementById('p-text').value = el.text;
+            document.getElementById('p-font').value = el.font;
+            document.getElementById('p-tcolor').value = el.tColor;
             document.getElementById('p-c1').value = el.c1;
             document.getElementById('p-c2').value = el.c2;
             document.getElementById('p-z').value = el.z;
             document.getElementById('p-radius').value = el.radius;
-            document.getElementById('p-script').value = el.scriptType;
-
-            if(el.scriptType === 'open') {
-                targetDiv.style.display = 'block';
-                targetSelect.innerHTML = '<option value="">Frame Seçin...</option>';
-                elements.filter(e => e.type === 'Frame').forEach(f => {
-                    targetSelect.innerHTML += `<option value="${f.id}" ${el.targetId === f.id ? 'selected' : ''}>${f.name}</option>`;
-                });
-            } else {
-                targetDiv.style.display = 'none';
-            }
+            document.getElementById('p-hover').checked = el.hoverEffect;
         } else {
             inputs.style.display = 'none';
         }
@@ -188,22 +194,22 @@
     function apply() {
         const el = elements.find(e => e.id === selectedId);
         if(!el) return;
-        el.name = document.getElementById('p-name').value;
         el.text = document.getElementById('p-text').value;
+        el.font = document.getElementById('p-font').value;
+        el.tColor = document.getElementById('p-tcolor').value;
         el.c1 = document.getElementById('p-c1').value;
         el.c2 = document.getElementById('p-c2').value;
         el.z = parseInt(document.getElementById('p-z').value) || 0;
         el.radius = document.getElementById('p-radius').value;
-        el.scriptType = document.getElementById('p-script').value;
-        el.targetId = document.getElementById('p-target').value;
+        el.hoverEffect = document.getElementById('p-hover').checked;
         render();
     }
 
     function startDrag(e, el) {
         let ox = e.clientX - el.x, oy = e.clientY - el.y;
         const move = (e) => {
-            el.x = e.clientX - ox;
-            el.y = e.clientY - oy;
+            el.x = Math.max(0, Math.min(e.clientX - ox, view.offsetWidth - el.w));
+            el.y = Math.max(0, Math.min(e.clientY - oy, view.offsetHeight - el.h));
             render();
         };
         const stop = () => document.removeEventListener('mousemove', move);
@@ -214,9 +220,9 @@
     function startResize(e, el) {
         e.stopPropagation();
         const move = (e) => {
-            const rect = document.getElementById('viewport').getBoundingClientRect();
-            el.w = e.clientX - (el.x + rect.left);
-            el.h = e.clientY - (el.y + rect.top);
+            const rect = view.getBoundingClientRect();
+            el.w = Math.max(30, e.clientX - (el.x + rect.left));
+            el.h = Math.max(20, e.clientY - (el.y + rect.top));
             render();
         };
         const stop = () => document.removeEventListener('mousemove', move);
@@ -224,22 +230,22 @@
         document.addEventListener('mouseup', stop);
     }
 
+    function exportLua() {
+        let code = `-- Roblox UI Expert v1.9\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))\nsg.IgnoreGuiInset = true\n`;
+        elements.forEach(el => {
+            code += `\n-- [[ ${el.name} ]]\nlocal ${el.id} = Instance.new("${el.type}", sg)\n${el.id}.Size = UDim2.new(0, ${el.w}, 0, ${el.h})\n${el.id}.Position = UDim2.new(0, ${el.x}, 0, ${el.y})\n${el.id}.ZIndex = ${el.z}\n`;
+            if(el.hoverEffect && el.type === 'TextButton') {
+                code += `${el.id}.MouseEnter:Connect(function() ${el.id}.BackgroundColor3 = Color3.new(1,1,1) end)\n`;
+            }
+            code += `local corner = Instance.new("UICorner", ${el.id}); corner.CornerRadius = UDim.new(0, ${el.radius})\n`;
+        });
+        console.log(code);
+        alert("Lua Kodu Konsola Yazdırıldı (F12)!");
+    }
+
     function deleteSelected() {
         elements = elements.filter(e => e.id !== selectedId);
         select(null);
-    }
-
-    function exportLua() {
-        let code = `-- Roblox UI v1.8 Pro\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))\nsg.IgnoreGuiInset = true\n`;
-        elements.forEach(el => {
-            code += `\nlocal ${el.id} = Instance.new("${el.type}", sg)\n${el.id}.Name = "${el.name}"\n${el.id}.Size = UDim2.new(0, ${el.w}, 0, ${el.h})\n${el.id}.Position = UDim2.new(0, ${el.x}, 0, ${el.y})\n${el.id}.ZIndex = ${el.z}\n`;
-            if(el.type !== 'Frame') code += `${el.id}.Text = "${el.text}"\n`;
-            if(el.scriptType === 'open' && el.targetId) {
-                code += `${el.id}.Activated:Connect(function() sg:FindFirstChild("${elements.find(e=>e.id===el.targetId).name}").Visible = not sg:FindFirstChild("${elements.find(e=>e.id===el.targetId).name}").Visible end)\n`;
-            }
-        });
-        alert("LUA Kodu Kopyalandı/Hazır!");
-        console.log(code);
     }
 
     render();
