@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeka Portalı - Full Gelişim Sürümü</title>
+    <title>Zeka Portalı - 7 Günlük Ödül Sistemi</title>
     <style>
-        :root { --primary: #00d2ff; --bg: #0f0f0f; --card: #1a1a1a; --danger: #ff4e50; --xp: #ffca28; }
+        :root { --primary: #00d2ff; --bg: #0f0f0f; --card: #1a1a1a; --danger: #ff4e50; --xp: #ffca28; --success: #2ecc71; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
         .container { background: var(--card); padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); text-align: center; width: 380px; min-height: 600px; border: 1px solid #333; position: relative; display: flex; flex-direction: column; }
         
@@ -17,23 +17,32 @@
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .menu-btn { background: #262626; border: 1px solid #444; color: white; padding: 15px 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 0.8rem; }
         .menu-btn:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .daily-btn { grid-column: span 2; background: #2ecc71; color: black; border: none; height: 45px; margin-bottom: 10px; font-weight: 900; border-radius: 12px; cursor: pointer; }
-        .daily-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+        
+        .daily-btn { grid-column: span 2; background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; border: none; height: 50px; margin-bottom: 15px; font-weight: 900; border-radius: 12px; cursor: pointer; position: relative; overflow: hidden; }
+        .daily-btn:disabled { background: #333; color: #777; cursor: not-allowed; }
+
+        /* Günlük Ödül Modal */
+        #daily-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); border-radius: 30px; z-index: 200; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .calendar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; width: 100%; }
+        .day-box { background: #222; padding: 10px 5px; border-radius: 10px; border: 1px solid #444; font-size: 0.7rem; opacity: 0.5; }
+        .day-box.active { opacity: 1; border-color: var(--xp); background: #332b00; transform: scale(1.05); }
+        .day-box.completed { opacity: 1; border-color: var(--success); color: var(--success); }
 
         .hidden { display: none !important; }
         .display-box { font-size: 3rem; font-weight: bold; margin-bottom: 20px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
         input { width: 80%; padding: 12px; border-radius: 10px; background: #222; color: white; text-align: center; font-size: 1.8rem; margin: 15px 0; border: none; border-bottom: 3px solid #444; outline: none; }
-        .btn { border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; color: white; width: 100%; margin-top: 10px; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
-
-        /* Hız Tuzağı Grid */
-        .panic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .panic-box { background: #333; aspect-ratio: 1/1; border-radius: 12px; cursor: pointer; transition: 0.1s; border: 2px solid #444; }
-        .panic-active { background: #39ff14 !important; box-shadow: 0 0 25px #39ff14; border-color: white; }
+        .btn { border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; color: white; width: 100%; margin-top: 10px; }
 
         #result-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.98); border-radius: 30px; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
         .xp-gain { color: var(--xp); font-size: 1.5rem; font-weight: bold; margin-top: 10px; animation: bounce 1s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        
+        .timer-text { font-size: 0.8rem; color: var(--danger); font-weight: bold; margin-top: 5px; }
+
+        /* Hız Tuzağı Grid */
+        .panic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .panic-box { background: #333; aspect-ratio: 1/1; border-radius: 12px; cursor: pointer; border: 2px solid #444; }
+        .panic-active { background: #39ff14 !important; box-shadow: 0 0 20px #39ff14; }
     </style>
 </head>
 <body>
@@ -42,96 +51,170 @@
     <div id="main-menu">
         <div class="level-panel">
             <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
-                <span id="rank-name" style="color:var(--xp); font-weight:bold;">YÜKLENİYOR...</span>
+                <span id="rank-name" style="color:var(--xp); font-weight:bold;">YÜKLENİYOR</span>
                 <span id="level-text">Seviye 1</span>
             </div>
             <div class="xp-bar-bg"><div id="xp-fill" class="xp-bar-fill"></div></div>
             <div id="xp-info" style="font-size:0.7rem; margin-top:5px; color:#888;">0 / 500 XP</div>
         </div>
 
-        <button id="daily-reward-btn" class="daily-btn" onclick="claimDaily()">🎁 GÜNLÜK ÖDÜLÜ AL</button>
+        <button id="daily-btn-main" class="daily-btn" onclick="openDailyModal()">🎁 GÜNLÜK ÖDÜLÜ AL</button>
+        <div id="main-timer" class="timer-text" style="margin-bottom:15px; margin-top:-10px;"></div>
 
         <div class="menu-grid">
             <button class="menu-btn" onclick="showMathSetup()">MATEMATİK<br>YARIŞI</button>
             <button class="menu-btn" onclick="initVerify()">HIZLI<br>KARAR</button>
             <button class="menu-btn" onclick="initGuess()">SAYI<br>TAHMİN</button>
             <button class="menu-btn" onclick="initCode()">KOD<br>KIRICI</button>
-            <button class="menu-btn" style="grid-column: span 2; background: linear-gradient(135deg, #ff00cc, #3333ff); border:none; height:60px; font-size:1.2rem; margin-top:10px;" onclick="initPanic()">⚡ HIZ TUZAĞI</button>
+            <button class="menu-btn" style="grid-column: span 2; background: linear-gradient(135deg, #ff00cc, #3333ff); height:60px; font-size:1.2rem; border:none;" onclick="initPanic()">⚡ HIZ TUZAĞI</button>
         </div>
     </div>
 
+    <div id="daily-modal">
+        <h2 style="color:var(--xp); margin-bottom:5px;">7 GÜNLÜK ÖDÜL</h2>
+        <p style="font-size:0.8rem; color:#888;">Her gün gel, daha büyük ödüller kazan!</p>
+        <div class="calendar" id="calendar-grid"></div>
+        <div id="modal-timer-container">
+            <p id="modal-timer-label" style="margin:0; font-size:0.9rem;">Sıradaki Ödül İçin Kalan:</p>
+            <p id="modal-timer" class="timer-text" style="font-size:1.5rem;"></p>
+        </div>
+        <button id="claim-btn" class="btn" style="background:var(--success); display:none;" onclick="processClaim()">ÖDÜLÜ AL!</button>
+        <button class="btn" style="background:#333;" onclick="closeDailyModal()">KAPAT</button>
+    </div>
+
     <div id="math-setup" class="hidden">
-        <h2 style="color:var(--primary);">Zorluk Seç</h2>
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
+        <h2>Zorluk</h2>
+        <div style="display:flex; gap:5px; margin-bottom:10px;">
             <button class="btn" style="background:#2ecc71" onclick="mRange=10; mTime=30; mLabel='Kolay'">KOLAY</button>
             <button class="btn" style="background:#f1c40f; color:black" onclick="mRange=50; mTime=25; mLabel='Orta'">ORTA</button>
             <button class="btn" style="background:#e67e22" onclick="mRange=100; mTime=20; mLabel='Zor'">ZOR</button>
         </div>
         <div class="menu-grid">
-            <button class="menu-btn" onclick="mOp='+'">+</button>
-            <button class="menu-btn" onclick="mOp='-'">-</button>
-            <button class="menu-btn" onclick="mOp='x'">×</button>
-            <button class="menu-btn" onclick="mOp='/'">÷</button>
+            <button class="menu-btn" onclick="mOp='+'">+</button><button class="menu-btn" onclick="mOp='-'">-</button>
+            <button class="menu-btn" onclick="mOp='x'">×</button><button class="menu-btn" onclick="mOp='/'">÷</button>
         </div>
-        <button class="btn" style="background:white; color:black; margin-top:25px;" onclick="startMath()">OYUNU BAŞLAT</button>
+        <button class="btn" style="background:white; color:black; margin-top:20px;" onclick="startMath()">BAŞLA</button>
     </div>
 
     <div id="game-container" class="hidden">
-        <h2 id="game-title" style="color:var(--primary); margin:0; font-size:1.2rem;">Oyun</h2>
+        <h2 id="game-title" style="color:var(--primary); margin:0; font-size:1.1rem;">Oyun</h2>
         <div id="game-content"></div>
-        <button class="btn" style="background:#333; margin-top:20px; font-size:0.8rem; width:auto; padding:8px 20px;" onclick="location.reload()">VAZGEÇ</button>
+        <button class="btn" style="background:#333; margin-top:20px; font-size:0.8rem; width:auto;" onclick="location.reload()">ÇIK</button>
     </div>
 
     <div id="result-modal">
         <h2 id="res-title">BİTTİ!</h2>
-        <p id="res-text" style="font-size:1.2rem;">Skor: 0</p>
+        <p id="res-text">Skor: 0</p>
         <div id="res-xp" class="xp-gain"></div>
-        <button class="btn" style="background:var(--primary); color:black; width:180px; margin-top:30px; font-size:1.2rem;" onclick="location.reload()">TAMAM</button>
+        <button class="btn" style="background:var(--primary); color:black; width:150px; margin-top:20px;" onclick="location.reload()">TAMAM</button>
     </div>
 </div>
 
 <script>
-    // --- VERİ SİSTEMİ ---
-    let user = JSON.parse(localStorage.getItem('zeka_user')) || { xp: 0, level: 1, lastDaily: 0 };
+    // --- VERİ VE ÖDÜL SİSTEMİ ---
+    let user = JSON.parse(localStorage.getItem('zeka_user_v2')) || { 
+        xp: 0, level: 1, lastClaim: 0, dayStreak: 0 
+    };
+    const dailyRewards = [100, 200, 300, 500, 750, 1000, 2500];
     const ranks = ["ÇAYLAK", "MERAKLI", "YETENEKLİ", "UZMAN", "DAHİ", "EFSANE"];
 
     function updateUI() {
         const nextXP = user.level * 500;
-        const progress = (user.xp / nextXP) * 100;
-        document.getElementById('xp-fill').style.width = progress + "%";
+        document.getElementById('xp-fill').style.width = (user.xp / nextXP * 100) + "%";
         document.getElementById('xp-info').innerText = `${user.xp} / ${nextXP} XP`;
         document.getElementById('level-text').innerText = `Seviye ${user.level}`;
         document.getElementById('rank-name').innerText = ranks[Math.min(user.level-1, 5)];
-        
+        localStorage.setItem('zeka_user_v2', JSON.stringify(user));
+        checkDailyStatus();
+    }
+
+    function checkDailyStatus() {
         const now = Date.now();
-        const btn = document.getElementById('daily-reward-btn');
-        if (now - user.lastDaily < 86400000) {
+        const diff = now - user.lastClaim;
+        const canClaim = diff >= 86400000; // 24 saat
+        const btn = document.getElementById('daily-btn-main');
+        
+        if (!canClaim) {
             btn.disabled = true;
             btn.innerText = "ÖDÜL ALINDI";
+            startGlobalTimer(86400000 - diff);
+        } else {
+            btn.disabled = false;
+            btn.innerText = "🎁 GÜNLÜK ÖDÜLÜ AL";
+            document.getElementById('main-timer').innerText = "";
         }
-        localStorage.setItem('zeka_user', JSON.stringify(user));
     }
+
+    function startGlobalTimer(ms) {
+        const timerEl = document.getElementById('main-timer');
+        const modalTimerEl = document.getElementById('modal-timer');
+        
+        const itv = setInterval(() => {
+            ms -= 1000;
+            if (ms <= 0) {
+                clearInterval(itv);
+                updateUI();
+                return;
+            }
+            const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000), s = Math.floor((ms%60000)/1000);
+            const timeStr = `${h}s ${m}d ${s}s`;
+            if(timerEl) timerEl.innerText = "Yeni ödül için: " + timeStr;
+            if(modalTimerEl) modalTimerEl.innerText = timeStr;
+        }, 1000);
+    }
+
+    function openDailyModal() {
+        document.getElementById('daily-modal').style.display = 'flex';
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = "";
+        
+        const canClaim = (Date.now() - user.lastClaim) >= 86400000;
+        
+        for(let i=0; i<7; i++) {
+            const box = document.createElement('div');
+            box.className = 'day-box';
+            if(i < user.dayStreak) box.className += ' completed';
+            if(i === user.dayStreak && canClaim) box.className += ' active';
+            box.innerHTML = `<b>${i+1}. GÜN</b><br>${dailyRewards[i]} XP`;
+            grid.appendChild(box);
+        }
+
+        const claimBtn = document.getElementById('claim-btn');
+        const timerCont = document.getElementById('modal-timer-container');
+        
+        if(canClaim) {
+            claimBtn.style.display = 'block';
+            timerCont.style.display = 'none';
+        } else {
+            claimBtn.style.display = 'none';
+            timerCont.style.display = 'block';
+        }
+    }
+
+    function processClaim() {
+        const reward = dailyRewards[user.dayStreak];
+        user.xp += reward;
+        user.lastClaim = Date.now();
+        user.dayStreak = (user.dayStreak + 1) % 7;
+        
+        alert(`Tebrikler! ${reward} XP kazandın!`);
+        updateUI();
+        closeDailyModal();
+    }
+
+    function closeDailyModal() { document.getElementById('daily-modal').style.display = 'none'; }
 
     function addXP(amount) {
         user.xp += amount;
-        let nextXP = user.level * 500;
-        while (user.xp >= nextXP) {
-            user.xp -= nextXP;
+        while(user.xp >= user.level * 500) {
+            user.xp -= user.level * 500;
             user.level++;
-            nextXP = user.level * 500;
-            alert("TEBRİKLER! Seviye Atladın: " + user.level);
+            alert("SEVİYE ATLADIN! Yeni Seviye: " + user.level);
         }
         updateUI();
     }
 
-    function claimDaily() {
-        const bonus = Math.floor(Math.random() * 401) + 100;
-        user.lastDaily = Date.now();
-        addXP(bonus);
-        alert(`Günlük Hediyen: ${bonus} XP!`);
-    }
-
-    // --- OYUN MANTIĞI ---
+    // --- OYUNLAR ---
     let score = 0, timeLeft = 0, timerInterval, currentAns, mRange=10, mTime=30, mLabel='Kolay', mOp='+';
 
     function showResult(title, text, xp) {
@@ -148,7 +231,6 @@
         document.getElementById('math-setup').classList.remove('hidden');
     }
 
-    /* 1. HIZ TUZAĞI */
     function initPanic() {
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
@@ -156,126 +238,73 @@
         score = 0; timeLeft = 3.0;
         let activeIdx = -1;
         function spawn() {
-            document.getElementById('game-content').innerHTML = `
-                <div class="panic-grid">${[0,1,2,3,4,5,6,7,8].map(i=>`<div class="panic-box" id="p-${i}" onclick="h(${i})"></div>`).join('')}</div>
-                <p style="font-size:1.5rem; margin-top:20px; font-weight:bold; color:var(--danger);" id="timer-display">${timeLeft.toFixed(1)}s</p>
-                <p>Skor: ${score}</p>`;
+            document.getElementById('game-content').innerHTML = `<div class="panic-grid">${[0,1,2,3,4,5,6,7,8].map(i=>`<div class="panic-box" id="p-${i}" onclick="hitH(${i})"></div>`).join('')}</div><p id="pt">${timeLeft.toFixed(1)}s | Skor: ${score}</p>`;
             activeIdx = Math.floor(Math.random()*9);
             document.getElementById(`p-${activeIdx}`).classList.add('panic-active');
         }
-        window.h = (i) => {
-            if(i===activeIdx){ score++; timeLeft = Math.min(timeLeft + 0.4, 4.0); spawn(); } 
-            else { timeLeft -= 0.7; document.body.style.background="#400"; setTimeout(()=>document.body.style.background=var(--bg),100); }
+        window.hitH = (i) => {
+            if(i === activeIdx) { score++; timeLeft = Math.min(timeLeft+0.4, 4); spawn(); }
+            else { timeLeft -= 0.6; }
         };
         spawn();
         timerInterval = setInterval(() => {
             timeLeft -= 0.1;
-            if(timeLeft <= 0) showResult("SÜRE DOLDU!", "Hız Tuzağı'na yakalandın. Skor: "+score, score * 10);
-            else { const el = document.getElementById('timer-display'); if(el) el.innerText = timeLeft.toFixed(1)+"s"; }
+            if(timeLeft <= 0) showResult("SÜRE DOLDU", "Skor: "+score, score*10);
+            else { const el=document.getElementById('pt'); if(el) el.innerText = timeLeft.toFixed(1) + "s | Skor: " + score; }
         }, 100);
     }
 
-    /* 2. MATEMATİK YARIŞI */
     function startMath() {
         document.getElementById('math-setup').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
-        document.getElementById('game-title').innerText = "MATEMATİK YARIŞI";
         score = 0; timeLeft = mTime;
         function gen() {
-            let n1=Math.floor(Math.random()*mRange)+1, n2=Math.floor(Math.random()*mRange)+1;
+            let n1 = Math.floor(Math.random()*mRange)+1, n2 = Math.floor(Math.random()*mRange)+1;
             if(mOp==='+') currentAns = n1+n2;
             else if(mOp==='-') { n1=Math.max(n1,n2); n2=Math.min(n1,n2); currentAns=n1-n2; }
-            else if(mOp==='x') { n1=Math.floor(Math.random()*12)+1; currentAns=n1*n2; }
+            else if(mOp==='x') { n1=Math.floor(Math.random()*10)+1; currentAns=n1*n2; }
             else { currentAns=Math.floor(Math.random()*10)+1; n1=currentAns*n2; }
-            
-            document.getElementById('game-content').innerHTML = `
-                <div class="display-box">${n1} ${mOp=='/'?'÷':(mOp=='x'?'×':mOp)} ${n2}</div>
-                <input type="number" id="ai" autofocus placeholder="?">
-                <p>Süre: <span id="m-time">${timeLeft}</span> | Skor: ${score}</p>`;
-            document.getElementById('ai').oninput = function(){ if(this.value==currentAns){ score+=10; gen(); } };
+            document.getElementById('game-content').innerHTML = `<div class="display-box">${n1}${mOp=='x'?'×':(mOp=='/'?'÷':mOp)}${n2}</div><input type="number" id="mi" autofocus><p>${timeLeft}s | Skor: ${score}</p>`;
+            document.getElementById('mi').oninput = function() { if(this.value == currentAns) { score+=10; gen(); } };
         }
         gen();
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            if(timeLeft <= 0) showResult("SÜRE BİTTİ", "Zorluk: "+mLabel+" | Skor: "+score, score * 2);
-            else { const el = document.getElementById('m-time'); if(el) el.innerText = timeLeft; }
-        }, 1000);
+        timerInterval = setInterval(() => { timeLeft--; if(timeLeft<=0) showResult("MATEMATİK", "Skor: "+score, score); }, 1000);
     }
 
-    /* 3. HIZLI KARAR */
     function initVerify() {
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
-        document.getElementById('game-title').innerText = "HIZLI KARAR";
         score = 0;
         function nxt() {
-            let n1=Math.floor(Math.random()*20), n2=Math.floor(Math.random()*20), r=n1+n2;
-            let isCorrect = Math.random() > 0.5;
-            let displayRes = isCorrect ? r : r + (Math.floor(Math.random()*5)+1);
-            document.getElementById('game-content').innerHTML = `
-                <div class="display-box">${n1} + ${n2} = ${displayRes}</div>
-                <div class="menu-grid">
-                    <button class="btn" style="background:#2ecc71" onclick="vC(true,${isCorrect})">DOĞRU</button>
-                    <button class="btn" style="background:#e74c3c" onclick="vC(false,${isCorrect})">YANLIŞ</button>
-                </div>
-                <p style="margin-top:20px">Skor: ${score}</p>`;
+            let n1=Math.floor(Math.random()*20), n2=Math.floor(Math.random()*20), r=n1+n2, ok=Math.random()>0.5, d=ok?r:r+3;
+            document.getElementById('game-content').innerHTML = `<div class="display-box">${n1}+${n2}=${d}</div><div class="menu-grid"><button class="btn" style="background:#2ecc71" onclick="vC(true,${ok})">D</button><button class="btn" style="background:#e74c3c" onclick="vC(false,${ok})">Y</button></div>`;
         }
-        window.vC = (playerChoice, actual) => {
-            if(playerChoice === actual) { score += 10; nxt(); }
-            else showResult("HATALI KARAR", "Odaklanman lazım! Skor: "+score, score * 3);
-        };
+        window.vC = (p, a) => { if(p===a){ score+=10; nxt(); } else showResult("HATA", "Skor: "+score, score*2); };
         nxt();
     }
 
-    /* 4. SAYI TAHMİN */
     function initGuess() {
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
-        document.getElementById('game-title').innerText = "SAYI TAHMİN";
-        let secret = Math.floor(Math.random()*100)+1, tries = 0;
-        document.getElementById('game-content').innerHTML = `
-            <p>1-100 arası bir sayı tuttum.</p>
-            <input type="number" id="gI" placeholder="Tahminin?">
-            <button class="btn" style="background:var(--primary); color:black" onclick="gC()">TAHMİN ET</button>
-            <p id="hint" style="margin-top:15px; font-weight:bold;"></p>`;
-        window.gC = () => {
-            let val = parseInt(document.getElementById('gI').value); tries++;
-            if(val === secret) showResult("TEBRİKLER", tries+" denemede buldun!", 200);
-            else {
-                document.getElementById('hint').innerText = val < secret ? "DAHA BÜYÜK! ⬆️" : "DAHA KÜÇÜK! ⬇️";
-                document.getElementById('gI').value = '';
-                document.getElementById('gI').focus();
-            }
-        };
+        let s = Math.floor(Math.random()*100)+1, t=0;
+        document.getElementById('game-content').innerHTML = `<input type="number" id="gi" placeholder="1-100"><button class="btn" onclick="gC()">DENE</button><p id="gh"></p>`;
+        window.gC = () => { let v=document.getElementById('gi').value; t++; if(v==s) showResult("BİLDİN", t+" deneme", 100); else document.getElementById('gh').innerText=v<s?"YUKARI":"AŞAĞI"; };
     }
 
-    /* 5. KOD KIRICI */
     function initCode() {
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
-        document.getElementById('game-title').innerText = "KOD KIRICI";
-        let code = [Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1];
-        let tries = 0;
-        document.getElementById('game-content').innerHTML = `
-            <p>3 rakamlı gizli kodu bul (1-6 arası)</p>
-            <input type="text" id="cI" maxlength="3" placeholder="Örn: 123">
-            <button class="btn" onclick="cC()">KODU DENE</button>
-            <div id="logs" style="margin-top:15px; font-size:0.8rem; background:#111; padding:10px; border-radius:10px; max-height:100px; overflow-y:auto;"></div>`;
-        window.cC = () => {
-            let val = document.getElementById('cI').value; if(val.length < 3) return;
-            tries++; let guess = val.split('').map(Number), pos = 0, num = 0;
-            let tempCode = [...code], tempGuess = [...guess];
-            for(let i=0; i<3; i++) if(tempGuess[i]===tempCode[i]){ pos++; tempCode[i]=tempGuess[i]=null; }
-            for(let i=0; i<3; i++) if(tempGuess[i]!==null && tempCode.includes(tempGuess[i])){ num++; tempCode[tempCode.indexOf(tempGuess[i])]=null; }
-            if(pos === 3) showResult("KOD KIRILDI!", tries+" denemede bitti.", 300);
-            else {
-                document.getElementById('logs').innerHTML += `<div>${val} > ${pos} Doğru Yer, ${num} Yanlış Yer</div>`;
-                document.getElementById('cI').value = '';
-            }
+        let c = [Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1], t=0;
+        document.getElementById('game-content').innerHTML = `<input type="text" id="ci" maxlength="3"><button class="btn" onclick="cC()">KIR</button><div id="cl"></div>`;
+        window.cC = () => { 
+            let v=document.getElementById('ci').value; if(v.length<3)return; t++;
+            let g=v.split('').map(Number), p=0, n=0, tc=[...c], tg=[...g];
+            for(let i=0;i<3;i++)if(tg[i]===tc[i]){p++;tc[i]=tg[i]=null;}
+            for(let i=0;i<3;i++)if(tg[i]!==null&&tc.includes(tg[i])){n++;tc[tc.indexOf(tg[i])]=null;}
+            if(p===3) showResult("KIRILDI", t+" deneme", 250); else document.getElementById('cl').innerHTML += `<div>${v}: ${p}D ${n}Y</div>`;
         };
     }
 
-    // Uygulamayı başlat
     updateUI();
 </script>
 </body>
