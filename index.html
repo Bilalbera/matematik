@@ -3,40 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeka Portalı - Hız Tuzağı</title>
+    <title>Zeka Portalı - Hız Tuzağı Sürümü</title>
     <style>
         :root { --primary: #00d2ff; --bg: #0f0f0f; --card: #1a1a1a; --danger: #ff4e50; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
-        .container { background: var(--card); padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); text-align: center; width: 380px; min-height: 550px; border: 1px solid #333; position: relative; display: flex; flex-direction: column; justify-content: center; }
         
-        /* Menü Tasarımı */
+        .container { 
+            background: var(--card); padding: 30px; border-radius: 30px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8); text-align: center; 
+            width: 380px; min-height: 550px; border: 1px solid #333; 
+            position: relative; display: flex; flex-direction: column; justify-content: center; 
+        }
+
+        /* Menü */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .menu-btn { background: #262626; border: 1px solid #444; color: white; padding: 18px 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 0.85rem; }
+        .menu-btn { 
+            background: #262626; border: 1px solid #444; color: white; 
+            padding: 18px 10px; border-radius: 12px; cursor: pointer; 
+            transition: 0.3s; font-weight: bold; font-size: 0.85rem; 
+        }
         .menu-btn:hover { border-color: var(--primary); transform: translateY(-3px); background: #333; }
         .hidden { display: none !important; }
-        
-        /* Oyun Alanı */
+
+        /* Oyun Görselleri */
         .display-box { font-size: 3.5rem; font-weight: bold; margin-bottom: 20px; text-shadow: 0 0 15px rgba(255,255,255,0.1); }
-        input { width: 80%; padding: 12px; border-radius: 10px; border: none; background: #222; color: white; text-align: center; font-size: 2rem; margin: 15px 0; outline: none; border-bottom: 3px solid #444; }
+        input { 
+            width: 80%; padding: 12px; border-radius: 10px; border: none; 
+            background: #222; color: white; text-align: center; 
+            font-size: 2rem; margin: 15px 0; outline: none; border-bottom: 3px solid #444; 
+        }
         input:focus { border-bottom-color: var(--primary); }
-        .btn { border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; color: white; width: 100%; margin-top: 10px; }
-        
-        /* HIZ TUZAĞI Grid */
+        .btn { border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; color: white; width: 100%; margin-top: 10px; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
+
+        /* Hız Tuzağı Grid */
         .panic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
         .panic-box { background: #262626; aspect-ratio: 1/1; border-radius: 12px; cursor: pointer; transition: 0.1s; border: 2px solid #333; }
         .panic-active { background: #39ff14 !important; box-shadow: 0 0 30px #39ff14; border-color: white; transform: scale(0.92); }
 
-        /* Modal */
-        #result-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); border-radius: 30px; flex-direction: column; justify-content: center; align-items: center; z-index: 100; animation: fadeIn 0.3s; }
+        /* Sonuç Paneli (Modal) */
+        #result-modal { 
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.95); border-radius: 30px; 
+            flex-direction: column; justify-content: center; align-items: center; 
+            z-index: 100; animation: fadeIn 0.3s; 
+        }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .wrong-flash { background: #601010 !important; }
+        .correct-flash { background: #106030 !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="main-menu">
-        <h1 style="color:var(--primary); margin-bottom:10px; letter-spacing:1px;">ZEKA MERKEZİ</h1>
+        <h1 style="color:var(--primary); margin-bottom:10px;">ZEKA MERKEZİ</h1>
         <p style="font-size:0.9rem; color:#888; margin-bottom:25px;">Zihnini test etmeye hazır mısın?</p>
         <div class="menu-grid">
             <button class="menu-btn" onclick="showMathSetup()">MATEMATİK<br>YARIŞI</button>
@@ -50,9 +71,9 @@
     <div id="math-setup" class="hidden">
         <h2 style="color:var(--primary);">Ayar Seç</h2>
         <div style="display:flex; gap:8px; margin-bottom:15px;">
-            <button class="btn" style="background:#2ecc71" onclick="mRange=10; mTime=30; mLabel='Kolay'">KOLAY</button>
-            <button class="btn" style="background:#f1c40f; color:black" onclick="mRange=50; mTime=25; mLabel='Orta'">ORTA</button>
-            <button class="btn" style="background:#e67e22" onclick="mRange=100; mTime=20; mLabel='Zor'">ZOR</button>
+            <button class="btn" style="background:#2ecc71" onclick="setMathParams(10, 30, 'Kolay')">KOLAY</button>
+            <button class="btn" style="background:#f1c40f; color:black" onclick="setMathParams(50, 25, 'Orta')">ORTA</button>
+            <button class="btn" style="background:#e67e22" onclick="setMathParams(100, 20, 'Zor')">ZOR</button>
         </div>
         <div class="menu-grid">
             <button class="menu-btn" style="font-size:1.5rem" onclick="mOp='+'">+</button>
@@ -72,7 +93,7 @@
     <div id="result-modal">
         <h2 id="res-title" style="color:var(--danger); font-size:2.5rem; margin:0;">BİTTİ!</h2>
         <p id="res-text" style="font-size:1.4rem; margin:15px 0;">Skor: 0</p>
-        <p id="res-extra" style="font-weight:bold;"></p>
+        <p id="res-extra" style="font-weight:bold; font-size: 1.1rem;"></p>
         <button class="btn" style="background:var(--primary); color:black; width:150px; font-size:1.1rem; margin-top:20px;" onclick="location.reload()">TAMAM</button>
     </div>
 </div>
@@ -81,7 +102,15 @@
     let score = 0, timeLeft = 0, timerInterval, currentAns;
     let mRange=10, mTime=30, mLabel='Kolay', mOp='+';
 
-    function showMathSetup() { document.getElementById('main-menu').classList.add('hidden'); document.getElementById('math-setup').classList.remove('hidden'); }
+    function showMathSetup() { 
+        document.getElementById('main-menu').classList.add('hidden'); 
+        document.getElementById('math-setup').classList.remove('hidden'); 
+    }
+
+    function setMathParams(r, t, l) {
+        mRange = r; mTime = t; mLabel = l;
+        alert(l + " seçildi!");
+    }
 
     function showResult(title, text, extra = "") {
         clearInterval(timerInterval);
@@ -90,6 +119,7 @@
         const ex = document.getElementById('res-extra');
         ex.innerText = extra;
         
+        // Zorluk Renkleri
         if(extra.includes("Kolay")) ex.style.color = "#2ecc71";
         else if(extra.includes("Orta")) ex.style.color = "#f1c40f";
         else if(extra.includes("Zor")) ex.style.color = "#e67e22";
@@ -98,7 +128,12 @@
         document.getElementById('result-modal').style.display = 'flex';
     }
 
-    /* --- HIZ TUZAĞI --- */
+    function flash(cls) {
+        document.body.classList.add(cls);
+        setTimeout(() => document.body.classList.remove(cls), 100);
+    }
+
+    /* --- 1. HIZ TUZAĞI --- */
     function initPanic() {
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
@@ -110,8 +145,8 @@
             document.getElementById('game-content').innerHTML = `
                 <div class="panic-grid">${[0,1,2,3,4,5,6,7,8].map(i => `<div class="panic-box" id="p-${i}" onclick="hitPanic(${i})"></div>`).join('')}</div>
                 <div style="margin-top:25px; font-weight:bold;">
-                    <div style="font-size:1.8rem; color:var(--danger);" id="p-time">${timeLeft.toFixed(1)}s</div>
-                    <div style="font-size:1.2rem; color:var(--primary);">Puan: ${score}</div>
+                    <div style="font-size:2rem; color:var(--danger);" id="p-time">${timeLeft.toFixed(1)}s</div>
+                    <div style="font-size:1.2rem; color:var(--primary);">Skor: ${score}</div>
                 </div>
             `;
             spawnBtn();
@@ -132,22 +167,21 @@
                 if(timeLeft > 3.5) timeLeft = 3.5;
                 spawnBtn();
             } else {
-                timeLeft -= 0.7;
-                document.body.classList.add('wrong-flash');
-                setTimeout(() => document.body.classList.remove('wrong-flash'), 100);
+                timeLeft -= 0.8;
+                flash('wrong-flash');
             }
         };
 
         renderGrid();
         timerInterval = setInterval(() => {
             timeLeft -= 0.1;
-            if(timeLeft <= 0) showResult("TUZAK!", "Zaman seni yakaladı!", "Skor: " + score);
+            if(timeLeft <= 0) showResult("TUZAK!", "Hızına yenik düştün!", "Toplam Skor: " + score);
             const timeEl = document.getElementById('p-time');
             if(timeEl) timeEl.innerText = timeLeft.toFixed(1) + "s";
         }, 100);
     }
 
-    /* --- MATEMATİK YARIŞI --- */
+    /* --- 2. MATEMATİK YARIŞI --- */
     function startMath() {
         document.getElementById('math-setup').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
@@ -157,7 +191,7 @@
         timerInterval = setInterval(() => {
             timeLeft--;
             if(document.getElementById('m-clk')) document.getElementById('m-clk').innerText = timeLeft;
-            if(timeLeft <= 0) showResult("Süre Bitti!", "Harikaydın!", "Zorluk: " + mLabel);
+            if(timeLeft <= 0) showResult("Süre Bitti!", "İyi iş çıkardın!", "Zorluk: " + mLabel);
         }, 1000);
     }
 
@@ -171,14 +205,18 @@
         document.getElementById('game-content').innerHTML = `
             <div class="display-box">${n1} ${mOp=='/'?'÷':(mOp=='x'?'×':mOp)} ${n2}</div>
             <input type="number" id="ainp" autofocus placeholder="Cevap?">
-            <div style="font-size:1.1rem;">Skor: ${score} | Kalan: <span id="m-clk">${timeLeft}</span>s</div>
+            <div style="font-size:1.2rem;">Skor: ${score} | Kalan: <span id="m-clk" style="color:var(--danger)">${timeLeft}</span>s</div>
         `;
         const inp = document.getElementById('ainp');
         inp.focus();
-        inp.oninput = function() { if(this.value == currentAns) { score+=10; genMath(); } };
+        inp.oninput = function() { 
+            if(this.value == currentAns) { 
+                score+=10; flash('correct-flash'); genMath(); 
+            } 
+        };
     }
 
-    /* --- DİĞERLERİ --- */
+    /* --- 3. HIZLI KARAR --- */
     function initVerify() {
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
@@ -187,29 +225,45 @@
         function nxt() {
             let n1=Math.floor(Math.random()*20), n2=Math.floor(Math.random()*20), r=n1+n2, ok=Math.random()>0.5, d=ok?r:r+Math.floor(Math.random()*3)+1;
             document.getElementById('game-content').innerHTML = `<div class="display-box">${n1}+${n2}=${d}</div>
-            <button class="btn" style="background:#2ecc71" onclick="vC(true,${ok})">DOĞRU</button>
-            <button class="btn" style="background:#e74c3c" onclick="vC(false,${ok})">YANLIŞ</button><p style="margin-top:15px">Skor: ${score}</p>`;
+            <div class="menu-grid">
+                <button class="btn" style="background:#2ecc71" onclick="vC(true,${ok})">DOĞRU</button>
+                <button class="btn" style="background:#e74c3c" onclick="vC(false,${ok})">YANLIŞ</button>
+            </div><p style="margin-top:15px; font-weight:bold;">Skor: ${score}</p>`;
         }
-        window.vC = (p, a) => { if(p===a) { score+=10; nxt(); } else showResult("Hata!", "Daha dikkatli ol!", "Skor: "+score); };
+        window.vC = (p, a) => { if(p===a) { score+=10; nxt(); } else showResult("Hata!", "Daha hızlı ve dikkatli ol!", "Skor: "+score); };
         nxt();
     }
 
+    /* --- 4. SAYI TAHMİN --- */
     function initGuess() {
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
         document.getElementById('game-title').innerText = "Sayı Tahmin";
         let s=Math.floor(Math.random()*100)+1, t=0;
-        document.getElementById('game-content').innerHTML = `<p>1-100 arası bir sayı tuttum.</p><input type="number" id="gI"><button class="btn" style="background:var(--primary);color:black" onclick="gC()">TAHMİN ET</button><p id="h" style="margin-top:10px"></p>`;
-        window.gC = () => { let v=parseInt(document.getElementById('gI').value); t++; if(v===s) showResult("Bildin!", t+" hamlede bitti.", "Harika!"); else document.getElementById('h').innerText=v<s?"Yukarı ⬆️":"Aşağı ⬇️"; };
+        document.getElementById('game-content').innerHTML = `<p>1-100 arası bir sayı tuttum.</p><input type="number" id="gI" placeholder="Tahmin et!"><button class="btn" style="background:var(--primary);color:black" onclick="gC()">GÖNDER</button><p id="h" style="margin-top:10px; font-weight:bold;"></p>`;
+        window.gC = () => { 
+            let v=parseInt(document.getElementById('gI').value); t++; 
+            if(v===s) showResult("Bildin!", t+" hamlede buldun.", "Harika!"); 
+            else { document.getElementById('h').innerText=v<s?"Yukarı ⬆️":"Aşağı ⬇️"; document.getElementById('gI').value=''; }
+        };
     }
 
+    /* --- 5. KOD KIRICI --- */
     function initCode() {
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-container').classList.remove('hidden');
         document.getElementById('game-title').innerText = "Kod Kırıcı";
         let c=[Math.floor(Math.random()*6)+1,Math.floor(Math.random()*6)+1,Math.floor(Math.random()*6)+1], t=0;
-        document.getElementById('game-content').innerHTML = `<p>3 Rakamlı Kod (1-6)</p><input type="text" id="cI" maxlength="3"><button class="btn" onclick="cC()">DENE</button><div id="l" style="margin-top:10px; font-size:0.8rem;"></div>`;
-        window.cC = () => { let v=document.getElementById('cI').value; if(v.length<3)return; t++; let g=v.split('').map(Number), p=0, n=0, tc=[...c], tg=[...g]; for(let i=0;i<3;i++)if(tg[i]===tc[i]){p++;tc[i]=tg[i]=null;} for(let i=0;i<3;i++)if(tg[i]!==null&&tc.includes(tg[i])){n++;tc[tc.indexOf(tg[i])]=null;} if(p===3)showResult("Kod Çözüldü!", t+" hamlede bitti.", "Tebrikler!"); else document.getElementById('l').innerHTML += `> ${v}: ${p}D ${n}Y<br>`; };
+        document.getElementById('game-content').innerHTML = `<p>3 Rakamlı Kod (1-6)</p><input type="text" id="cI" maxlength="3" placeholder="---"><button class="btn" onclick="cC()">DENE</button><div id="l" style="margin-top:10px; font-size:0.8rem; height:100px; overflow-y:auto; background:#111; padding:5px; border-radius:10px;"></div>`;
+        window.cC = () => { 
+            let v=document.getElementById('cI').value; if(v.length<3)return; t++; 
+            let g=v.split('').map(Number), p=0, n=0, tc=[...c], tg=[...g]; 
+            for(let i=0;i<3;i++)if(tg[i]===tc[i]){p++;tc[i]=tg[i]=null;} 
+            for(let i=0;i<3;i++)if(tg[i]!==null&&tc.includes(tg[i])){n++;tc[tc.indexOf(tg[i])]=null;} 
+            if(p===3)showResult("Kod Çözüldü!", t+" hamlede sistem kırıldı.", "Tebrikler!"); 
+            else document.getElementById('l').innerHTML += `> ${v}: ${p}D (Doğru Yer), ${n}Y (Yanlış Yer)<br>`; 
+            document.getElementById('cI').value='';
+        };
     }
 </script>
 </body>
