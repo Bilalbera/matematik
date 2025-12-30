@@ -22,7 +22,6 @@
 
         h1 { color: #00d2ff; letter-spacing: 2px; margin-bottom: 30px; }
 
-        /* Buton Stilleri */
         .btn {
             border: none; padding: 18px; font-size: 1.2rem; 
             border-radius: 15px; cursor: pointer; transition: 0.3s;
@@ -32,7 +31,6 @@
         .btn-start { background: #00d2ff; color: #121212; font-size: 1.4rem; }
         .btn-start:hover { transform: scale(1.05); background: #00b4db; }
 
-        /* Zorluk Menüsü (Başta Gizli) */
         #difficulty-menu { display: none; flex-direction: column; gap: 10px; animation: slideUp 0.4s; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -41,7 +39,6 @@
         .zor { background: #e67e22; }
         .imkansiz { background: #c0392b; }
 
-        /* Oyun Ekranı */
         #game-screen { display: none; }
         #question { font-size: 4.5rem; margin: 20px 0; font-weight: bold; }
         input { 
@@ -50,13 +47,13 @@
             color: white; text-align: center; outline: none; margin-bottom: 20px;
         }
 
-        /* Oyun Bitti Ekranı */
         #result-modal {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #1e1e1e; border-radius: 30px;
             flex-direction: column; justify-content: center; align-items: center; z-index: 10;
         }
         
+        .result-info { font-size: 1.4rem; margin: 5px 0; }
         .correct-flash { background: #1b4332 !important; }
     </style>
 </head>
@@ -70,10 +67,10 @@
 
     <div id="difficulty-menu">
         <h2 style="color: #00d2ff;">Zorluk Seç</h2>
-        <button class="btn kolay" onclick="startGame(10, 30)">KOLAY</button>
-        <button class="btn orta" onclick="startGame(50, 25)">ORTA</button>
-        <button class="btn zor" onclick="startGame(100, 20)">ZOR</button>
-        <button class="btn imkansiz" onclick="startGame(500, 15)">İMKANSIZ</button>
+        <button class="btn kolay" onclick="startGame(10, 30, 'Kolay')">KOLAY</button>
+        <button class="btn orta" onclick="startGame(50, 25, 'Orta')">ORTA</button>
+        <button class="btn zor" onclick="startGame(100, 20, 'Zor')">ZOR</button>
+        <button class="btn imkansiz" onclick="startGame(500, 15, 'İmkansız')">İMKANSIZ</button>
     </div>
 
     <div id="game-screen">
@@ -86,23 +83,25 @@
     </div>
 
     <div id="result-modal">
-        <h2 style="color: #ff4e50; font-size: 2.5rem;">Süre Doldu!</h2>
-        <p id="final-score" style="font-size: 1.8rem; margin-bottom: 30px;">Skorun: 0</p>
+        <h2 style="color: #ff4e50; font-size: 2.5rem; margin-bottom: 10px;">Süre Doldu!</h2>
+        <p id="final-score" class="result-info">Skorun: 0</p>
+        <p id="final-diff" class="result-info" style="color: #aaa; margin-bottom: 30px;">Zorluk: Kolay</p>
         <button class="btn btn-start" onclick="location.reload()">TAMAM</button>
     </div>
 </div>
 
 <script>
-    let score = 0, timeLeft = 30, correctAnswer, timerInterval, maxNum = 10;
+    let score = 0, timeLeft = 30, correctAnswer, timerInterval, maxNum = 10, currentDiffLabel = '';
 
     function showDifficulties() {
         document.getElementById('main-menu').style.display = 'none';
         document.getElementById('difficulty-menu').style.display = 'flex';
     }
 
-    function startGame(range, time) {
+    function startGame(range, time, label) {
         maxNum = range;
         timeLeft = time;
+        currentDiffLabel = label;
         document.getElementById('difficulty-menu').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
         
@@ -147,6 +146,7 @@
     function showResult() {
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('final-score').innerText = "Skorun: " + score;
+        document.getElementById('final-diff').innerText = "Zorluk: " + currentDiffLabel;
         document.getElementById('result-modal').style.display = 'flex';
     }
 </script>
