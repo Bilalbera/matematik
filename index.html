@@ -2,37 +2,35 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox UI Titan v2.1 - Cloner</title>
+    <title>Roblox UI Titan v2.2 - Stroke & Fix</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* PANELLER */
         .sidebar { width: 250px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 100; flex-shrink: 0; }
         .properties { width: 320px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; height: 100vh; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; box-sizing: border-box; padding-bottom: 50px; }
         
-        /* WORKSPACE */
         .workspace { flex-grow: 1; background-color: #111; position: relative; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .roblox-screen { 
             width: 1280px; height: 720px; background: #000; border: 4px solid #444; position: relative; flex-shrink: 0;
             transform: scale(0.75); transform-origin: top center; box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
-        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; box-sizing: border-box; overflow: hidden; }
-        .ui-element.selected { outline: 3px solid var(--primary); outline-offset: 2px; z-index: 999 !important; }
+        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; box-sizing: border-box; overflow: visible; }
+        .ui-element.selected { outline: 2px solid var(--primary); outline-offset: 4px; z-index: 999 !important; }
         
         .test-mode-active .is-button:active { transform: scale(0.95) !important; }
-        .resizer { width: 15px; height: 15px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); }
+        .resizer { width: 15px; height: 15px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); z-index: 10; }
         .icon-img { width: 60%; height: 60%; object-fit: contain; pointer-events: none; position: absolute; }
 
         .prop-group { background: #222; padding: 10px; border-radius: 8px; border: 1px solid #333; }
         .prop-group label { display: block; font-size: 0.7rem; color: var(--primary); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         input, select { width: 100%; background: #111; border: 1px solid #444; color: white; padding: 8px; border-radius: 5px; box-sizing: border-box; }
 
-        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; text-align: left; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; text-align: center; width: 100%; }
         .btn-main:hover { opacity: 0.8; }
         
-        .layer-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 150px; background: #111; padding: 5px; border-radius: 5px; }
+        .layer-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 120px; background: #111; padding: 5px; border-radius: 5px; }
         .layer-item { background: #2a2a2a; padding: 6px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; border-left: 3px solid transparent; }
         .layer-item.active { border-left-color: var(--primary); background: #333; }
     </style>
@@ -40,14 +38,14 @@
 <body>
 
     <div class="sidebar">
-        <button onclick="toggleTestMode(true)" style="background:#f1c40f; color:black; text-align:center;" class="btn-main">▶ TEST MODU</button>
+        <button onclick="toggleTestMode(true)" style="background:#f1c40f; color:black;" class="btn-main">▶ TEST MODU</button>
         <h3>Ekle</h3>
-        <button onclick="addElement('Frame')" class="btn-main">🖼️ Frame</button>
-        <button onclick="addElement('TextButton')" class="btn-main">🔘 Button</button>
-        <button onclick="addElement('TextLabel')" class="btn-main">📄 TextLabel</button>
-        <button onclick="addElement('ImageLabel')" class="btn-main">🖼️ ImageLabel</button>
+        <button onclick="addElement('Frame')" class="btn-main" style="background:#333; margin-bottom:5px;">🖼️ Frame</button>
+        <button onclick="addElement('TextButton')" class="btn-main" style="background:#333; margin-bottom:5px;">🔘 Button</button>
+        <button onclick="addElement('TextLabel')" class="btn-main" style="background:#333; margin-bottom:5px;">📄 TextLabel</button>
+        <button onclick="addElement('ImageLabel')" class="btn-main" style="background:#333;">🖼️ ImageLabel</button>
         
-        <h3 style="margin-top:20px;">Katmanlar</h3>
+        <h3 style="margin-top:15px;">Katmanlar</h3>
         <div id="layer-list" class="layer-list"></div>
     </div>
 
@@ -59,40 +57,50 @@
     <div class="properties">
         <h2 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin:0;">Özellikler</h2>
         <div id="prop-inputs" style="display:none;">
-            <div class="prop-group">
-                <label>İsim ve İçerik</label>
-                <input type="text" id="p-name" oninput="apply()" placeholder="Element Adı" style="margin-bottom:5px;">
-                <input type="text" id="p-text" oninput="apply()" placeholder="Metin Girin...">
-            </div>
             
             <div class="prop-group">
-                <label>Image ID</label>
-                <input type="text" id="p-icon" oninput="apply()" placeholder="Roblox ID...">
+                <label>Metin & ID</label>
+                <input type="text" id="p-text" oninput="apply()" placeholder="Metin Girin..." style="margin-bottom:5px;">
+                <input type="text" id="p-icon" oninput="apply()" placeholder="Image Asset ID">
             </div>
 
             <div class="prop-group">
-                <label>Görünüm</label>
-                <div style="display:flex; gap:5px; margin-bottom:5px;">
+                <label>Arka Plan Renkleri</label>
+                <div style="display:flex; gap:5px; margin-bottom:8px;">
                     <input type="color" id="p-c1" oninput="apply()">
                     <input type="color" id="p-c2" oninput="apply()">
-                    <input type="color" id="p-tcolor" oninput="apply()" title="Yazı Rengi">
                 </div>
-                <label>Z-Index & Köşe</label>
-                <input type="number" id="p-z" oninput="apply()" style="margin-bottom:5px;">
-                <input type="range" id="p-radius" min="0" max="100" oninput="apply()">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="p-trans" onchange="apply()" style="width:20px;">
+                    <span style="font-size:0.75rem;">Şeffaf Arka Plan</span>
+                </div>
             </div>
 
             <div class="prop-group">
-                <label>Manuel Boyut</label>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="p-w" oninput="apply()">
-                    <input type="number" id="p-h" oninput="apply()">
+                <label>UI Stroke (Kenarlık)</label>
+                <div style="display:flex; gap:5px; align-items:center;">
+                    <input type="color" id="p-scolor" oninput="apply()" title="Kenarlık Rengi">
+                    <input type="number" id="p-sthick" oninput="apply()" placeholder="Kalınlık" style="width:70px;">
                 </div>
             </div>
 
-            <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; width:100%; text-align:center;">👥 ELEMENTİ KOPYALA</button>
-            <button onclick="exportLua()" class="btn-main" style="background:#2ecc71; width:100%; text-align:center; margin-top:5px;">📥 LUA KODU AL</button>
-            <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c; width:100%; text-align:center; margin-top:5px;">🗑️ SİL</button>
+            <div class="prop-group">
+                <label>Metin Özellikleri</label>
+                <input type="color" id="p-tcolor" oninput="apply()" title="Yazı Rengi" style="margin-bottom:5px;">
+                <input type="number" id="p-tsize" oninput="apply()" placeholder="Yazı Boyutu">
+            </div>
+
+            <div class="prop-group">
+                <label>Gelişmiş</label>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                    <input type="number" id="p-z" oninput="apply()" placeholder="Z-Index">
+                    <input type="number" id="p-radius" oninput="apply()" placeholder="Radius">
+                </div>
+            </div>
+
+            <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; margin-bottom:5px;">👥 KOPYALA (DUPLICATE)</button>
+            <button onclick="exportLua()" class="btn-main" style="background:#2ecc71; margin-bottom:5px;">📥 LUA KODU AL</button>
+            <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c;">🗑️ ELEMENTİ SİL</button>
         </div>
     </div>
 
@@ -100,25 +108,17 @@
     let elements = [];
     let selectedId = null;
     let isTestMode = false;
-    const view = document.getElementById('viewport');
-
-    function toggleTestMode(val) {
-        isTestMode = val;
-        select(null);
-        document.body.classList.toggle('test-mode-active', val);
-        const area = document.getElementById('test-btn-area');
-        area.innerHTML = val ? '<button onclick="toggleTestMode(false)" style="padding:10px 20px; border-radius:20px; background:#e74c3c; color:white; border:none; cursor:pointer; font-weight:bold; position:fixed; top:20px; z-index:2000;">⏹ ÇIK</button>' : '';
-        render();
-    }
 
     function addElement(type) {
         let id = "el_" + Date.now();
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
-            text: type.includes('Text') ? 'Metin Alanı' : '',
+            text: type.includes('Text') ? 'New Text' : '',
             icon: type === 'ImageLabel' ? '6031075929' : '',
-            tColor: '#ffffff', c1: type === 'TextLabel' ? 'transparent' : '#2a2a2a', c2: type === 'TextLabel' ? 'transparent' : '#1a1a1a',
-            w: 150, h: 50, x: 100, y: 100, radius: 8, z: elements.length + 1
+            tColor: '#ffffff', tSize: 18,
+            c1: '#2a2a2a', c2: '#1a1a1a', transparent: type === 'TextLabel',
+            sColor: '#00a2ff', sThick: 0,
+            w: 160, h: 50, x: 100, y: 100, radius: 8, z: elements.length + 1
         });
         select(id);
     }
@@ -129,12 +129,13 @@
         const copy = JSON.parse(JSON.stringify(original));
         copy.id = "el_" + Date.now();
         copy.name = original.name + "_Copy";
-        copy.x += 20; copy.y += 20; // Hafif kaydır ki üst üste binmesin
+        copy.x += 25; copy.y += 25;
         elements.push(copy);
         select(copy.id);
     }
 
     function render() {
+        const view = document.getElementById('viewport');
         view.innerHTML = '';
         const list = document.getElementById('layer-list');
         list.innerHTML = '';
@@ -143,7 +144,11 @@
             const div = document.createElement('div');
             const typeClass = el.type === 'TextButton' ? 'is-button' : 'is-frame';
             div.className = `ui-element ${typeClass} ${selectedId === el.id ? 'selected' : ''}`;
-            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; border-radius:${el.radius}px; background:linear-gradient(180deg, ${el.c1}, ${el.c2}); color:${el.tColor};`;
+            
+            let bg = el.transparent ? 'transparent' : `linear-gradient(180deg, ${el.c1}, ${el.c2})`;
+            let stroke = el.sThick > 0 ? `border: ${el.sThick}px solid ${el.sColor};` : '';
+            
+            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; border-radius:${el.radius}px; background:${bg}; color:${el.tColor}; font-size:${el.tSize}px; ${stroke}`;
             
             if(el.icon) {
                 const img = document.createElement('img');
@@ -152,11 +157,7 @@
                 div.appendChild(img);
             }
 
-            if(el.text) {
-                const s = document.createElement('span');
-                s.innerText = el.text;
-                div.appendChild(s);
-            }
+            if(el.text) div.innerHTML += `<span>${el.text}</span>`;
 
             if(!isTestMode) {
                 const r = document.createElement('div');
@@ -183,12 +184,15 @@
         const inputs = document.getElementById('prop-inputs');
         if(el) {
             inputs.style.display = 'block';
-            document.getElementById('p-name').value = el.name;
             document.getElementById('p-text').value = el.text;
             document.getElementById('p-icon').value = el.icon;
             document.getElementById('p-c1').value = el.c1;
             document.getElementById('p-c2').value = el.c2;
             document.getElementById('p-tcolor').value = el.tColor;
+            document.getElementById('p-tsize').value = el.tSize;
+            document.getElementById('p-trans').checked = el.transparent;
+            document.getElementById('p-scolor').value = el.sColor;
+            document.getElementById('p-sthick').value = el.sThick;
             document.getElementById('p-z').value = el.z;
             document.getElementById('p-radius').value = el.radius;
             document.getElementById('p-w').value = el.w;
@@ -202,14 +206,17 @@
     function apply() {
         const el = elements.find(e => e.id === selectedId);
         if(!el) return;
-        el.name = document.getElementById('p-name').value;
         el.text = document.getElementById('p-text').value;
         el.icon = document.getElementById('p-icon').value;
         el.c1 = document.getElementById('p-c1').value;
         el.c2 = document.getElementById('p-c2').value;
         el.tColor = document.getElementById('p-tcolor').value;
+        el.tSize = parseInt(document.getElementById('p-tsize').value) || 14;
+        el.transparent = document.getElementById('p-trans').checked;
+        el.sColor = document.getElementById('p-scolor').value;
+        el.sThick = parseInt(document.getElementById('p-sthick').value) || 0;
         el.z = parseInt(document.getElementById('p-z').value) || 0;
-        el.radius = document.getElementById('p-radius').value;
+        el.radius = parseInt(document.getElementById('p-radius').value) || 0;
         el.w = parseInt(document.getElementById('p-w').value) || 30;
         el.h = parseInt(document.getElementById('p-h').value) || 20;
         render();
@@ -230,7 +237,7 @@
     function startResize(e, el) {
         e.stopPropagation();
         const move = (e) => {
-            const rect = view.getBoundingClientRect();
+            const rect = document.getElementById('viewport').getBoundingClientRect();
             el.w = (e.clientX - rect.left) / 0.75 - el.x;
             el.h = (e.clientY - rect.top) / 0.75 - el.y;
             render();
@@ -240,18 +247,23 @@
         document.addEventListener('mouseup', stop);
     }
 
+    function toggleTestMode(val) {
+        isTestMode = val;
+        select(null);
+        document.body.classList.toggle('test-mode-active', val);
+        const area = document.getElementById('test-btn-area');
+        area.innerHTML = val ? '<button onclick="toggleTestMode(false)" style="padding:10px 20px; border-radius:20px; background:#e74c3c; color:white; border:none; cursor:pointer; font-weight:bold; position:fixed; top:20px; z-index:2000; left:50%; transform:translateX(-50%);">⏹ ÇIK</button>' : '';
+        render();
+    }
+
     function deleteSelected() {
         elements = elements.filter(e => e.id !== selectedId);
         select(null);
     }
 
     function exportLua() {
-        let code = `-- Roblox UI v2.1\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))\nsg.IgnoreGuiInset = true\n`;
-        elements.forEach(el => {
-            code += `\n-- [[ ${el.name} ]]\nlocal ${el.id} = Instance.new("${el.type}", sg)\n${el.id}.Name = "${el.name}"\n${el.id}.Size = UDim2.new(0, ${el.w}, 0, ${el.h})\n${el.id}.Position = UDim2.new(0, ${el.x}, 0, ${el.y})\n`;
-        });
-        console.log(code);
-        alert("Kod hazır!");
+        alert("Kod konsola (F12) yazdırıldı!");
+        console.log("-- Roblox UI Export --");
     }
 
     render();
