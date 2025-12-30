@@ -34,18 +34,19 @@
         #difficulty-menu { display: none; flex-direction: column; gap: 10px; animation: slideUp 0.4s; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Zorluk Renkleri */
         .kolay { background: #2ecc71; }
         .orta { background: #f1c40f; color: #333; }
         .zor { background: #e67e22; }
-        .imkansiz { background: #c0392b; }
 
         #game-screen { display: none; }
-        #question { font-size: 4.5rem; margin: 20px 0; font-weight: bold; }
+        #question { font-size: 4.5rem; margin: 10px 0; font-weight: bold; }
         input { 
-            width: 80%; padding: 15px; font-size: 2.5rem; 
-            border: none; border-radius: 15px; background: #333;
-            color: white; text-align: center; outline: none; margin-bottom: 20px;
+            width: 80%; padding: 15px; font-size: 2rem; 
+            border: 2px solid #333; border-radius: 15px; background: #252525;
+            color: white; text-align: center; outline: none; margin-bottom: 15px;
         }
+        input:focus { border-color: #00d2ff; }
 
         #result-modal {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -55,6 +56,7 @@
         
         .result-info { font-size: 1.4rem; margin: 5px 0; }
         .correct-flash { background: #1b4332 !important; }
+        .wrong-flash { background: #431b1b !important; }
     </style>
 </head>
 <body>
@@ -67,16 +69,16 @@
 
     <div id="difficulty-menu">
         <h2 style="color: #00d2ff;">Zorluk Seç</h2>
-        <button class="btn kolay" onclick="startGame(10, 30, 'Kolay')">KOLAY</button>
-        <button class="btn orta" onclick="startGame(50, 25, 'Orta')">ORTA</button>
-        <button class="btn zor" onclick="startGame(100, 20, 'Zor')">ZOR</button>
-        <button class="btn imkansiz" onclick="startGame(500, 15, 'İmkansız')">İMKANSIZ</button>
+        <button class="btn kolay" onclick="startGame(10, 30, 'Kolay', '#2ecc71')">KOLAY</button>
+        <button class="btn orta" onclick="startGame(50, 25, 'Orta', '#f1c40f')">ORTA</button>
+        <button class="btn zor" onclick="startGame(100, 20, 'Zor', '#e67e22')">ZOR</button>
     </div>
 
     <div id="game-screen">
         <div id="question">?</div>
-        <input type="number" id="answer" placeholder="?" autocomplete="off">
-        <div style="display:flex; justify-content: space-around; font-size: 1.2rem;">
+        <input type="number" id="answer" placeholder="Cevap" autocomplete="off">
+        <button class="btn btn-start" onclick="checkAnswer()" style="padding: 10px; font-size: 1rem;">GÖNDER (Enter)</button>
+        <div style="display:flex; justify-content: space-around; font-size: 1.2rem; margin-top: 10px;">
             <span>Skor: <span id="score" style="color:#00d2ff">0</span></span>
             <span>Süre: <span id="timer" style="color:#ff4e50">30</span>s</span>
         </div>
@@ -85,23 +87,25 @@
     <div id="result-modal">
         <h2 style="color: #ff4e50; font-size: 2.5rem; margin-bottom: 10px;">Süre Doldu!</h2>
         <p id="final-score" class="result-info">Skorun: 0</p>
-        <p id="final-diff" class="result-info" style="color: #aaa; margin-bottom: 30px;">Zorluk: Kolay</p>
-        <button class="btn btn-start" onclick="location.reload()">TAMAM</button>
+        <p id="final-diff" class="result-info" style="font-weight: bold; margin-bottom: 30px;">Zorluk: Kolay</p>
+        <button class="btn btn-start" onclick="location.reload()">ANA MENÜ</button>
     </div>
 </div>
 
 <script>
-    let score = 0, timeLeft = 30, correctAnswer, timerInterval, maxNum = 10, currentDiffLabel = '';
+    let score = 0, timeLeft = 30, correctAnswer, timerInterval, maxNum = 10;
+    let currentDiffLabel = '', currentDiffColor = '';
 
     function showDifficulties() {
         document.getElementById('main-menu').style.display = 'none';
         document.getElementById('difficulty-menu').style.display = 'flex';
     }
 
-    function startGame(range, time, label) {
+    function startGame(range, time, label, color) {
         maxNum = range;
         timeLeft = time;
         currentDiffLabel = label;
+        currentDiffColor = color;
         document.getElementById('difficulty-menu').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
         
@@ -118,18 +122,33 @@
         document.getElementById('answer').focus();
     }
 
-    document.getElementById('answer').addEventListener('input', function() {
-        if (this.value == correctAnswer) {
+    // Cevap kontrol fonksiyonu (Buton ve Enter için)
+    function checkAnswer() {
+        const inputField = document.getElementById('answer');
+        const userAnswer = parseInt(inputField.value);
+
+        if (userAnswer === correctAnswer) {
             score += 10;
             document.getElementById('score').innerText = score;
-            flash();
+            flash('correct-flash');
             generateQuestion();
+        } else {
+            flash('wrong-flash');
+            inputField.value = '';
+            inputField.focus();
+        }
+    }
+
+    // Enter tuşu dinleyici
+    document.getElementById('answer').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
         }
     });
 
-    function flash() {
-        document.body.classList.add('correct-flash');
-        setTimeout(() => document.body.classList.remove('correct-flash'), 100);
+    function flash(className) {
+        document.body.classList.add(className);
+        setTimeout(() => document.body.classList.remove(className), 150);
     }
 
     function startTimer() {
@@ -146,7 +165,12 @@
     function showResult() {
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('final-score').innerText = "Skorun: " + score;
-        document.getElementById('final-diff').innerText = "Zorluk: " + currentDiffLabel;
+        
+        // Zorluk metnini ve rengini ayarla
+        const diffElement = document.getElementById('final-diff');
+        diffElement.innerText = "Zorluk: " + currentDiffLabel;
+        diffElement.style.color = currentDiffColor;
+        
         document.getElementById('result-modal').style.display = 'flex';
     }
 </script>
