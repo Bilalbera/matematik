@@ -3,188 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox UI Creator v1.1 - Drag & Drop</title>
+    <title>Roblox UI Pro Studio v1.3</title>
     <style>
-        :root { --primary: #00a2ff; --bg: #0a0a0a; --panel: #1e1e1e; --border: #333; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; user-select: none; }
+        :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; --selected: #007bff; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; user-select: none; }
         
-        .sidebar { width: 250px; background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 10; }
-        .tool-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; cursor: pointer; text-align: left; transition: 0.2s; }
-        .tool-btn:hover { background: var(--primary); transform: translateX(5px); }
+        /* Panel Tasarımları */
+        .sidebar, .properties { width: 280px; background: var(--panel); border: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+        .sidebar h2, .properties h3 { color: var(--primary); font-size: 1rem; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
 
-        .workspace { flex-grow: 1; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 25px 25px; position: relative; display: flex; justify-content: center; align-items: center; cursor: crosshair; }
-        .roblox-screen { width: 700px; height: 450px; background: rgba(0,0,0,0.6); border: 2px solid #444; position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        /* Araç Butonları */
+        .tool-btn { background: #252525; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; cursor: pointer; text-align: left; transition: 0.2s; font-size: 0.85rem; }
+        .tool-btn:hover { background: var(--primary); }
 
-        /* Sürüklenebilir Öğe */
-        #preview-element { 
+        /* Workspace */
+        .workspace { flex-grow: 1; background-color: #111; background-image: linear-gradient(#1a1a1a 1px, transparent 1px), linear-gradient(90deg, #1a1a1a 1px, transparent 1px); background-size: 20px 20px; position: relative; display: flex; justify-content: center; align-items: center; }
+        .roblox-screen { width: 640px; height: 360px; background: #000; border: 2px solid #555; position: relative; overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.7); }
+
+        /* Dinamik Elementler */
+        .ui-element { 
             position: absolute; 
-            width: 200px; 
-            height: 100px; 
-            background: var(--primary); 
-            border-radius: 8px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            cursor: move; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            left: 50px;
-            top: 50px;
-            z-index: 5;
-            transition: box-shadow 0.2s;
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; cursor: grab; box-sizing: border-box;
+            overflow: hidden;
         }
-        #preview-element:active { box-shadow: 0 0 25px var(--primary); opacity: 0.9; }
+        .ui-element.selected { outline: 2px solid white; outline-offset: 2px; }
 
-        .properties { width: 300px; background: var(--panel); border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
-        .prop-group { margin-bottom: 12px; }
-        .prop-group label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 4px; }
-        input, select { width: 100%; background: #2a2a2a; border: 1px solid #444; color: white; padding: 8px; border-radius: 5px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--primary); }
+        /* Gradient Katmanı */
+        .gradient-overlay {
+            position: absolute; width: 100%; height: 100%; pointer-events: none;
+        }
 
-        .pos-info { font-family: monospace; font-size: 0.7rem; color: var(--primary); background: #000; padding: 5px; border-radius: 4px; margin-top: 5px; }
-        .download-btn { background: #2ecc71; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; }
-        .download-btn:hover { background: #27ae60; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); }
+        /* Inputlar */
+        .prop-group { margin-bottom: 8px; }
+        .prop-group label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 3px; }
+        input, select { width: 100%; background: #222; border: 1px solid #444; color: white; padding: 6px; border-radius: 4px; font-size: 0.85rem; }
+        .flex-row { display: flex; gap: 5px; }
+
+        .download-btn { background: #2ecc71; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: auto; }
+        .element-item { background: #222; padding: 8px; border-radius: 4px; margin-bottom: 4px; font-size: 0.8rem; display: flex; justify-content: space-between; cursor: pointer; }
+        .element-item.active { border-left: 3px solid var(--primary); background: #2a2a2a; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2 style="color:var(--primary); font-size: 1.2rem;">Roblox UI v1.1</h2>
-        <button class="tool-btn" onclick="setType('Frame')">🖼️ Frame</button>
-        <button class="tool-btn" onclick="setType('TextButton')">🔘 TextButton</button>
-        <button class="tool-btn" onclick="setType('TextLabel')">🔤 TextLabel</button>
-        <hr style="width:100%; border:0; border-top:1px solid #333; margin:10px 0;">
-        <p style="font-size: 0.7rem; color: #777;">Öğeyi farenle istediğin yere taşı. Konum otomatik güncellenir.</p>
+        <h2>Element Ekle</h2>
+        <button class="tool-btn" onclick="addElement('Frame')">🖼️ Frame (Panel)</button>
+        <button class="tool-btn" onclick="addElement('TextButton')">🔘 TextButton</button>
+        <button class="tool-btn" onclick="addElement('TextLabel')">🔤 TextLabel</button>
+        
+        <h2 style="margin-top:20px;">Katmanlar (Layers)</h2>
+        <div id="layer-list"></div>
     </div>
 
     <div class="workspace">
-        <div class="roblox-screen" id="container">
-            <div id="preview-element">TASARIM</div>
-        </div>
+        <div class="roblox-screen" id="viewport"></div>
     </div>
 
-    <div class="properties">
-        <h3>Ayarlar</h3>
-        <div class="prop-group">
-            <label>Metin / İsim</label>
-            <input type="text" id="p-text" value="TASARIM" oninput="updateUI()">
-        </div>
-        <div class="prop-group">
-            <label>Renk</label>
-            <input type="color" id="p-color" value="#00a2ff" oninput="updateUI()">
-        </div>
-        <div class="prop-group">
-            <label>Köşe Yuvarlaklığı</label>
-            <input type="range" id="p-radius" min="0" max="100" value="12" oninput="updateUI()">
-        </div>
-        <div class="prop-group">
-            <label>Genişlik / Yükseklik</label>
-            <div style="display:flex; gap:5px;">
-                <input type="number" id="p-width" value="200" oninput="updateUI()">
-                <input type="number" id="p-height" value="80" oninput="updateUI()">
-            </div>
-        </div>
-        <div class="prop-group">
-            <label>Mevcut Konum (X, Y)</label>
-            <div id="pos-display" class="pos-info">X: 50, Y: 50</div>
-        </div>
+    <div class="properties" id="prop-panel">
+        <h3>Özellikler</h3>
+        <div id="prop-content">Seçili element yok.</div>
         
-        <button class="download-btn" onclick="downloadLua()">📥 LUA KODUNU İNDİR</button>
+        <div id="prop-inputs" style="display:none;">
+            <div class="prop-group"><label>Z-Index (Katman Sırası)</label><input type="number" id="p-zindex" oninput="apply()"></div>
+            <div class="prop-group"><label>Metin</label><input type="text" id="p-text" oninput="apply()"></div>
+            
+            <div class="prop-group">
+                <label>Gradient (Renk Geçişi)</label>
+                <div class="flex-row">
+                    <input type="color" id="p-color1" title="Başlangıç" oninput="apply()">
+                    <input type="color" id="p-color2" title="Bitiş" oninput="apply()">
+                </div>
+            </div>
+
+            <div class="prop-group">
+                <label>Boyut (Genişlik / Yükseklik)</label>
+                <div class="flex-row">
+                    <input type="number" id="p-w" oninput="apply()">
+                    <input type="number" id="p-h" oninput="apply()">
+                </div>
+            </div>
+
+            <div class="prop-group"><label>Köşe Yuvarlaklığı</label><input type="range" id="p-radius" min="0" max="50" oninput="apply()"></div>
+            
+            <button class="download-btn" onclick="exportLua()">📥 LUA KODUNU İNDİR</button>
+        </div>
     </div>
 
 <script>
-    let activeType = "Frame";
-    const el = document.getElementById('preview-element');
-    const container = document.getElementById('container');
-    let isDragging = false;
-    let offsetX, offsetY;
+    let elements = [];
+    let selectedId = null;
+    let nextId = 1;
 
-    // --- SÜRÜKLE BIRAK MANTIĞI ---
-    el.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        offsetX = e.clientX - el.offsetLeft;
-        offsetY = e.clientY - el.offsetTop;
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        
-        let newX = e.clientX - offsetX;
-        let newY = e.clientY - offsetY;
-
-        // Sınırlandırma (Container içinde tutma)
-        newX = Math.max(0, Math.min(newX, container.offsetWidth - el.offsetWidth));
-        newY = Math.max(0, Math.min(newY, container.offsetHeight - el.offsetHeight));
-
-        el.style.left = newX + "px";
-        el.style.top = newY + "px";
-        
-        document.getElementById('pos-display').innerText = `X: ${newX}, Y: ${newY}`;
-    });
-
-    document.addEventListener('mouseup', () => { isDragging = false; });
-
-    // --- GÜNCELLEME ---
-    function setType(t) { activeType = t; updateUI(); }
-
-    function updateUI() {
-        const text = document.getElementById('p-text').value;
-        const color = document.getElementById('p-color').value;
-        const radius = document.getElementById('p-radius').value;
-        const w = document.getElementById('p-width').value;
-        const h = document.getElementById('p-height').value;
-
-        el.innerText = text;
-        el.style.backgroundColor = color;
-        el.style.borderRadius = radius + "px";
-        el.style.width = w + "px";
-        el.style.height = h + "px";
+    function addElement(type) {
+        let id = "el_" + nextId++;
+        elements.push({
+            id: id,
+            type: type,
+            name: type + "_" + id,
+            text: type === 'Frame' ? '' : 'Metin',
+            color1: "#00a2ff",
+            color2: "#0055ff",
+            w: 150, h: 50,
+            x: 50, y: 50,
+            radius: 8,
+            zIndex: elements.length + 1
+        });
+        select(id);
+        render();
     }
 
-    // --- LUA İNDİRME ---
-    function downloadLua() {
-        const text = document.getElementById('p-text').value;
-        const color = document.getElementById('p-color').value;
-        const radius = document.getElementById('p-radius').value;
-        const posX = el.offsetLeft;
-        const posY = el.offsetTop;
-        const w = el.offsetWidth;
-        const h = el.offsetHeight;
+    function render() {
+        const viewport = document.getElementById('viewport');
+        const layers = document.getElementById('layer-list');
+        viewport.innerHTML = '';
+        layers.innerHTML = '';
 
-        const r = parseInt(color.substr(1,2), 16);
-        const g = parseInt(color.substr(3,2), 16);
-        const b = parseInt(color.substr(5,2), 16);
+        // Z-Index'e göre sırala (Görsel için)
+        let sorted = [...elements].sort((a,b) => a.zIndex - b.zIndex);
 
-        const code = `-- Roblox UI Script (v1.1 Generated)
+        sorted.forEach(el => {
+            // Viewport Render
+            const div = document.createElement('div');
+            div.className = `ui-element ${selectedId === el.id ? 'selected' : ''}`;
+            div.style.left = el.x + "px";
+            div.style.top = el.y + "px";
+            div.style.width = el.w + "px";
+            div.style.height = el.h + "px";
+            div.style.zIndex = el.zIndex;
+            div.style.borderRadius = el.radius + "px";
+            div.style.background = `linear-gradient(180deg, ${el.color1}, ${el.color2})`;
+            div.innerText = el.text;
+            div.style.color = "white";
+
+            div.onmousedown = (e) => startDrag(e, el);
+            div.onclick = (e) => { e.stopPropagation(); select(el.id); };
+            viewport.appendChild(div);
+
+            // Layer List Render
+            const item = document.createElement('div');
+            item.className = `element-item ${selectedId === el.id ? 'active' : ''}`;
+            item.innerHTML = `<span>${el.name}</span> <small>Z:${el.zIndex}</small>`;
+            item.onclick = () => select(el.id);
+            layers.appendChild(item);
+        });
+    }
+
+    function select(id) {
+        selectedId = id;
+        const el = elements.find(e => e.id === id);
+        const inputs = document.getElementById('prop-inputs');
+        const content = document.getElementById('prop-content');
+
+        if(el) {
+            inputs.style.display = 'block';
+            content.style.display = 'none';
+            document.getElementById('p-zindex').value = el.zIndex;
+            document.getElementById('p-text').value = el.text;
+            document.getElementById('p-color1').value = el.color1;
+            document.getElementById('p-color2').value = el.color2;
+            document.getElementById('p-w').value = el.w;
+            document.getElementById('p-h').value = el.h;
+            document.getElementById('p-radius').value = el.radius;
+        }
+        render();
+    }
+
+    function apply() {
+        if(!selectedId) return;
+        const el = elements.find(e => e.id === selectedId);
+        el.zIndex = parseInt(document.getElementById('p-zindex').value);
+        el.text = document.getElementById('p-text').value;
+        el.color1 = document.getElementById('p-color1').value;
+        el.color2 = document.getElementById('p-color2').value;
+        el.w = parseInt(document.getElementById('p-width')?.value || document.getElementById('p-w').value);
+        el.h = parseInt(document.getElementById('p-h').value);
+        el.radius = parseInt(document.getElementById('p-radius').value);
+        render();
+    }
+
+    // Sürükleme Sistemi
+    function startDrag(e, el) {
+        let offsetX = e.clientX - el.x;
+        let offsetY = e.clientY - el.y;
+        
+        function move(e) {
+            el.x = e.clientX - offsetX;
+            el.y = e.clientY - offsetY;
+            render();
+        }
+        
+        function stop() {
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', stop);
+        }
+        
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', stop);
+    }
+
+    function exportLua() {
+        let code = `-- Roblox UI Pro v1.3 (Optimized)
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "CustomGUI"
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.IgnoreGuiInset = true
 
-local Element = Instance.new("${activeType}")
-Element.Name = "MainFrame"
-Element.Parent = ScreenGui
-Element.BackgroundColor3 = Color3.fromRGB(${r}, ${g}, ${b})
-Element.Position = UDim2.new(0, ${posX}, 0, ${posY})
-Element.Size = UDim2.new(0, ${w}, 0, ${h})
-${activeType !== "Frame" ? 'Element.Text = "' + text + '"' : ''}
-${activeType !== "Frame" ? 'Element.TextColor3 = Color3.fromRGB(255, 255, 255)' : ''}
-${activeType !== "Frame" ? 'Element.Font = Enum.Font.GothamBold' : ''}
-${activeType !== "Frame" ? 'Element.TextSize = 18' : ''}
+`;
 
-local Corner = Instance.new("UICorner")
-Corner.CornerRadius = UDim.new(0, ${radius})
-Corner.Parent = Element
+        elements.forEach(el => {
+            const r1 = parseInt(el.color1.substr(1,2), 16), g1 = parseInt(el.color1.substr(3,2), 16), b1 = parseInt(el.color1.substr(5,2), 16);
+            const r2 = parseInt(el.color2.substr(1,2), 16), g2 = parseInt(el.color2.substr(3,2), 16), b2 = parseInt(el.color2.substr(5,2), 16);
 
-print("UI Başarıyla Yüklendi! Konum: ${posX}, ${posY}")`;
+            code += `
+-- [[ Element: ${el.name} ]]
+local ${el.id} = Instance.new("${el.type}")
+${el.id}.Name = "${el.name}"
+${el.id}.Parent = ScreenGui
+${el.id}.Size = UDim2.new(0, ${el.w}, 0, ${el.h})
+${el.id}.Position = UDim2.new(0, ${el.x}, 0, ${el.y})
+${el.id}.ZIndex = ${el.zIndex}
+${el.id}.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+${el.type !== 'Frame' ? el.id + '.Text = "' + el.text + '"' : ''}
 
-        const blob = new Blob([code], { type: "text/plain" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "RobloxUI.txt";
-        link.click();
+-- Aspect Ratio (Mobil Uyumluluk)
+local aspect = Instance.new("UIAspectRatioConstraint")
+aspect.AspectRatio = ${el.w / el.h}
+aspect.Parent = ${el.id}
+
+-- Gradient
+local grad = Instance.new("UIGradient")
+grad.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(${r1}, ${g1}, ${b1})),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(${r2}, ${g2}, ${b2}))
+})
+grad.Rotation = 90
+grad.Parent = ${el.id}
+
+-- Corners
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, ${el.radius})
+corner.Parent = ${el.id}
+`;
+        });
+
+        const blob = new Blob([code], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'RobloxProUI.txt';
+        a.click();
     }
-
-    updateUI();
 </script>
 </body>
 </html>
