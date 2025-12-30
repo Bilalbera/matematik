@@ -3,143 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox GUI Tasarımcı - UI Maker</title>
+    <title>Roblox UI Creator v1.1 - Drag & Drop</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0a0a0a; --panel: #1e1e1e; --border: #333; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; user-select: none; }
         
-        /* Sol Araç Paneli */
-        .sidebar { width: 250px; background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar { width: 250px; background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 10; }
         .tool-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; cursor: pointer; text-align: left; transition: 0.2s; }
-        .tool-btn:hover { background: var(--primary); }
+        .tool-btn:hover { background: var(--primary); transform: translateX(5px); }
 
-        /* Orta Önizleme Alanı */
-        .workspace { flex-grow: 1; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; position: relative; display: flex; justify-content: center; align-items: center; }
-        .roblox-screen { width: 600px; height: 400px; background: rgba(255,255,255,0.05); border: 2px solid #555; position: relative; overflow: hidden; }
+        .workspace { flex-grow: 1; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 25px 25px; position: relative; display: flex; justify-content: center; align-items: center; cursor: crosshair; }
+        .roblox-screen { width: 700px; height: 450px; background: rgba(0,0,0,0.6); border: 2px solid #444; position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
 
-        /* Tasarlanan Öğe */
-        #preview-element { position: absolute; top: 150px; left: 200px; width: 200px; height: 100px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: move; border: none; }
+        /* Sürüklenebilir Öğe */
+        #preview-element { 
+            position: absolute; 
+            width: 200px; 
+            height: 100px; 
+            background: var(--primary); 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            cursor: move; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            left: 50px;
+            top: 50px;
+            z-index: 5;
+            transition: box-shadow 0.2s;
+        }
+        #preview-element:active { box-shadow: 0 0 25px var(--primary); opacity: 0.9; }
 
-        /* Sağ Özellik Paneli */
-        .properties { width: 280px; background: var(--panel); border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .prop-group { margin-bottom: 15px; }
-        .prop-group label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 5px; }
-        input, select { width: 100%; background: #2a2a2a; border: 1px solid #444; color: white; padding: 8px; border-radius: 5px; box-sizing: border-box; }
+        .properties { width: 300px; background: var(--panel); border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+        .prop-group { margin-bottom: 12px; }
+        .prop-group label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 4px; }
+        input, select { width: 100%; background: #2a2a2a; border: 1px solid #444; color: white; padding: 8px; border-radius: 5px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--primary); }
 
-        /* İndirme Butonu */
-        .download-btn { background: #2ecc71; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: auto; }
-        .download-btn:hover { background: #27ae60; }
+        .pos-info { font-family: monospace; font-size: 0.7rem; color: var(--primary); background: #000; padding: 5px; border-radius: 4px; margin-top: 5px; }
+        .download-btn { background: #2ecc71; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+        .download-btn:hover { background: #27ae60; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h3>Elementler</h3>
-        <button class="tool-btn" onclick="setType('Frame')">🖼️ Frame (Panel)</button>
-        <button class="tool-btn" onclick="setType('TextButton')">🔘 TextButton (Buton)</button>
-        <button class="tool-btn" onclick="setType('TextLabel')">🔤 TextLabel (Yazı)</button>
-        <p style="font-size: 0.7rem; color: #666; margin-top: 20px;">Öğeyi sürükleyerek yerini değiştirebilirsiniz (Yakında).</p>
+        <h2 style="color:var(--primary); font-size: 1.2rem;">Roblox UI v1.1</h2>
+        <button class="tool-btn" onclick="setType('Frame')">🖼️ Frame</button>
+        <button class="tool-btn" onclick="setType('TextButton')">🔘 TextButton</button>
+        <button class="tool-btn" onclick="setType('TextLabel')">🔤 TextLabel</button>
+        <hr style="width:100%; border:0; border-top:1px solid #333; margin:10px 0;">
+        <p style="font-size: 0.7rem; color: #777;">Öğeyi farenle istediğin yere taşı. Konum otomatik güncellenir.</p>
     </div>
 
     <div class="workspace">
-        <div class="roblox-screen" id="screen">
-            <div id="preview-element" onclick="selectElement()">UI Öğesi</div>
+        <div class="roblox-screen" id="container">
+            <div id="preview-element">TASARIM</div>
         </div>
     </div>
 
     <div class="properties">
-        <h3>Özellikler</h3>
+        <h3>Ayarlar</h3>
+        <div class="prop-group">
+            <label>Metin / İsim</label>
+            <input type="text" id="p-text" value="TASARIM" oninput="updateUI()">
+        </div>
+        <div class="prop-group">
+            <label>Renk</label>
+            <input type="color" id="p-color" value="#00a2ff" oninput="updateUI()">
+        </div>
+        <div class="prop-group">
+            <label>Köşe Yuvarlaklığı</label>
+            <input type="range" id="p-radius" min="0" max="100" value="12" oninput="updateUI()">
+        </div>
+        <div class="prop-group">
+            <label>Genişlik / Yükseklik</label>
+            <div style="display:flex; gap:5px;">
+                <input type="number" id="p-width" value="200" oninput="updateUI()">
+                <input type="number" id="p-height" value="80" oninput="updateUI()">
+            </div>
+        </div>
+        <div class="prop-group">
+            <label>Mevcut Konum (X, Y)</label>
+            <div id="pos-display" class="pos-info">X: 50, Y: 50</div>
+        </div>
         
-        <div class="prop-group">
-            <label>Metin (Text)</label>
-            <input type="text" id="p-text" value="UI Öğesi" oninput="updatePreview()">
-        </div>
-
-        <div class="prop-group">
-            <label>Arka Plan Rengi</label>
-            <input type="color" id="p-color" value="#00a2ff" oninput="updatePreview()">
-        </div>
-
-        <div class="prop-group">
-            <label>Köşe Yuvarlaklığı (UICorner)</label>
-            <input type="range" id="p-radius" min="0" max="50" value="8" oninput="updatePreview()">
-        </div>
-
-        <div class="prop-group">
-            <label>Genişlik (Width)</label>
-            <input type="number" id="p-width" value="200" oninput="updatePreview()">
-        </div>
-
-        <div class="prop-group">
-            <label>Yükseklik (Height)</label>
-            <input type="number" id="p-height" value="100" oninput="updatePreview()">
-        </div>
-
-        <button class="download-btn" onclick="downloadCode()">📥 KODU İNDİR (.txt)</button>
+        <button class="download-btn" onclick="downloadLua()">📥 LUA KODUNU İNDİR</button>
     </div>
 
 <script>
-    let elementType = "Frame";
+    let activeType = "Frame";
+    const el = document.getElementById('preview-element');
+    const container = document.getElementById('container');
+    let isDragging = false;
+    let offsetX, offsetY;
 
-    function setType(type) {
-        elementType = type;
-        updatePreview();
-    }
+    // --- SÜRÜKLE BIRAK MANTIĞI ---
+    el.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+    });
 
-    function updatePreview() {
-        const el = document.getElementById('preview-element');
-        const text = document.getElementById('p-text').value;
-        const color = document.getElementById('p-color').value;
-        const radius = document.getElementById('p-radius').value;
-        const width = document.getElementById('p-width').value;
-        const height = document.getElementById('p-height').value;
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        let newX = e.clientX - offsetX;
+        let newY = e.clientY - offsetY;
 
-        el.innerText = text;
-        el.style.backgroundColor = color;
-        el.style.borderRadius = radius + "px";
-        el.style.width = width + "px";
-        el.style.height = height + "px";
-    }
+        // Sınırlandırma (Container içinde tutma)
+        newX = Math.max(0, Math.min(newX, container.offsetWidth - el.offsetWidth));
+        newY = Math.max(0, Math.min(newY, container.offsetHeight - el.offsetHeight));
 
-    function downloadCode() {
+        el.style.left = newX + "px";
+        el.style.top = newY + "px";
+        
+        document.getElementById('pos-display').innerText = `X: ${newX}, Y: ${newY}`;
+    });
+
+    document.addEventListener('mouseup', () => { isDragging = false; });
+
+    // --- GÜNCELLEME ---
+    function setType(t) { activeType = t; updateUI(); }
+
+    function updateUI() {
         const text = document.getElementById('p-text').value;
         const color = document.getElementById('p-color').value;
         const radius = document.getElementById('p-radius').value;
         const w = document.getElementById('p-width').value;
         const h = document.getElementById('p-height').value;
 
-        // RGB'ye çevirme
+        el.innerText = text;
+        el.style.backgroundColor = color;
+        el.style.borderRadius = radius + "px";
+        el.style.width = w + "px";
+        el.style.height = h + "px";
+    }
+
+    // --- LUA İNDİRME ---
+    function downloadLua() {
+        const text = document.getElementById('p-text').value;
+        const color = document.getElementById('p-color').value;
+        const radius = document.getElementById('p-radius').value;
+        const posX = el.offsetLeft;
+        const posY = el.offsetTop;
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+
         const r = parseInt(color.substr(1,2), 16);
         const g = parseInt(color.substr(3,2), 16);
         const b = parseInt(color.substr(5,2), 16);
 
-        const luaCode = `-- Roblox Studio UI Scripti
+        const code = `-- Roblox UI Script (v1.1 Generated)
 local ScreenGui = Instance.new("ScreenGui")
-local MainElement = Instance.new("${elementType}")
-local UICorner = Instance.new("UICorner")
-
+ScreenGui.Name = "CustomGUI"
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.Name = "CustomGui"
 
-MainElement.Parent = ScreenGui
-MainElement.Name = "DesignedUI"
-MainElement.BackgroundColor3 = Color3.fromRGB(${r}, ${g}, ${b})
-MainElement.Size = UDim2.new(0, ${w}, 0, ${h})
-MainElement.Position = UDim2.new(0.5, -${w/2}, 0.5, -${h/2})
-${elementType !== "Frame" ? 'MainElement.Text = "' + text + '"' : ''}
-${elementType !== "Frame" ? 'MainElement.TextColor3 = Color3.fromRGB(255, 255, 255)' : ''}
+local Element = Instance.new("${activeType}")
+Element.Name = "MainFrame"
+Element.Parent = ScreenGui
+Element.BackgroundColor3 = Color3.fromRGB(${r}, ${g}, ${b})
+Element.Position = UDim2.new(0, ${posX}, 0, ${posY})
+Element.Size = UDim2.new(0, ${w}, 0, ${h})
+${activeType !== "Frame" ? 'Element.Text = "' + text + '"' : ''}
+${activeType !== "Frame" ? 'Element.TextColor3 = Color3.fromRGB(255, 255, 255)' : ''}
+${activeType !== "Frame" ? 'Element.Font = Enum.Font.GothamBold' : ''}
+${activeType !== "Frame" ? 'Element.TextSize = 18' : ''}
 
-UICorner.CornerRadius = UDim.new(0, ${radius})
-UICorner.Parent = MainElement
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, ${radius})
+Corner.Parent = Element
 
-print("GUI başarıyla yüklendi!")`;
+print("UI Başarıyla Yüklendi! Konum: ${posX}, ${posY}")`;
 
-        const blob = new Blob([luaCode], { type: "text/plain" });
+        const blob = new Blob([code], { type: "text/plain" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = "Roblox_UI_Code.txt";
+        link.download = "RobloxUI.txt";
         link.click();
     }
+
+    updateUI();
 </script>
 </body>
 </html>
