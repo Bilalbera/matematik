@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox UI Titan v2.2 - Stroke & Fix</title>
+    <title>Roblox UI Titan v2.3 - Bug Fix</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -40,9 +40,9 @@
     <div class="sidebar">
         <button onclick="toggleTestMode(true)" style="background:#f1c40f; color:black;" class="btn-main">▶ TEST MODU</button>
         <h3>Ekle</h3>
-        <button onclick="addElement('Frame')" class="btn-main" style="background:#333; margin-bottom:5px;">🖼️ Frame</button>
-        <button onclick="addElement('TextButton')" class="btn-main" style="background:#333; margin-bottom:5px;">🔘 Button</button>
-        <button onclick="addElement('TextLabel')" class="btn-main" style="background:#333; margin-bottom:5px;">📄 TextLabel</button>
+        <button onclick="addElement('Frame')" class="btn-main" style="background:#333;">🖼️ Frame</button>
+        <button onclick="addElement('TextButton')" class="btn-main" style="background:#333;">🔘 Button</button>
+        <button onclick="addElement('TextLabel')" class="btn-main" style="background:#333;">📄 TextLabel</button>
         <button onclick="addElement('ImageLabel')" class="btn-main" style="background:#333;">🖼️ ImageLabel</button>
         
         <h3 style="margin-top:15px;">Katmanlar</h3>
@@ -59,48 +59,53 @@
         <div id="prop-inputs" style="display:none;">
             
             <div class="prop-group">
-                <label>Metin & ID</label>
-                <input type="text" id="p-text" oninput="apply()" placeholder="Metin Girin..." style="margin-bottom:5px;">
-                <input type="text" id="p-icon" oninput="apply()" placeholder="Image Asset ID">
+                <label>Kimlik ve Metin</label>
+                <input type="text" id="p-name" oninput="apply()" placeholder="Element İsmi (Object Name)" style="margin-bottom:5px;">
+                <input type="text" id="p-text" oninput="apply()" placeholder="Görünen Metin">
             </div>
 
             <div class="prop-group">
-                <label>Arka Plan Renkleri</label>
+                <label>Görsel & Arka Plan</label>
+                <input type="text" id="p-icon" oninput="apply()" placeholder="Asset ID" style="margin-bottom:8px;">
                 <div style="display:flex; gap:5px; margin-bottom:8px;">
                     <input type="color" id="p-c1" oninput="apply()">
                     <input type="color" id="p-c2" oninput="apply()">
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input type="checkbox" id="p-trans" onchange="apply()" style="width:20px;">
-                    <span style="font-size:0.75rem;">Şeffaf Arka Plan</span>
+                    <span style="font-size:0.75rem;">Şeffaf Yap</span>
                 </div>
             </div>
 
             <div class="prop-group">
                 <label>UI Stroke (Kenarlık)</label>
                 <div style="display:flex; gap:5px; align-items:center;">
-                    <input type="color" id="p-scolor" oninput="apply()" title="Kenarlık Rengi">
-                    <input type="number" id="p-sthick" oninput="apply()" placeholder="Kalınlık" style="width:70px;">
+                    <input type="color" id="p-scolor" oninput="apply()">
+                    <input type="number" id="p-sthick" oninput="apply()" placeholder="Kalınlık" style="width:80px;">
                 </div>
             </div>
 
             <div class="prop-group">
-                <label>Metin Özellikleri</label>
-                <input type="color" id="p-tcolor" oninput="apply()" title="Yazı Rengi" style="margin-bottom:5px;">
+                <label>Yazı Stili</label>
+                <input type="color" id="p-tcolor" oninput="apply()" style="margin-bottom:5px;">
                 <input type="number" id="p-tsize" oninput="apply()" placeholder="Yazı Boyutu">
             </div>
 
             <div class="prop-group">
-                <label>Gelişmiş</label>
+                <label>Yerleşim & Köşe</label>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:5px;">
+                    <input type="number" id="p-w" oninput="apply()" placeholder="Genişlik">
+                    <input type="number" id="p-h" oninput="apply()" placeholder="Yükseklik">
+                </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
                     <input type="number" id="p-z" oninput="apply()" placeholder="Z-Index">
                     <input type="number" id="p-radius" oninput="apply()" placeholder="Radius">
                 </div>
             </div>
 
-            <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; margin-bottom:5px;">👥 KOPYALA (DUPLICATE)</button>
-            <button onclick="exportLua()" class="btn-main" style="background:#2ecc71; margin-bottom:5px;">📥 LUA KODU AL</button>
-            <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c;">🗑️ ELEMENTİ SİL</button>
+            <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; margin-bottom:5px;">👥 KOPYALA</button>
+            <button onclick="exportLua()" class="btn-main" style="background:#2ecc71; margin-bottom:5px;">📥 LUA KODU</button>
+            <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c;">🗑️ SİL</button>
         </div>
     </div>
 
@@ -109,11 +114,28 @@
     let selectedId = null;
     let isTestMode = false;
 
+    // YARDIMCI: Güvenli Element Değeri Atama (Null hatasını önler)
+    function setVal(id, val) {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.type === 'checkbox') el.checked = val;
+            else el.value = val;
+        }
+    }
+
+    // YARDIMCI: Güvenli Değer Okuma
+    function getVal(id, isInt = false, isCheck = false) {
+        const el = document.getElementById(id);
+        if (!el) return isInt ? 0 : (isCheck ? false : "");
+        if (isCheck) return el.checked;
+        return isInt ? (parseInt(el.value) || 0) : el.value;
+    }
+
     function addElement(type) {
         let id = "el_" + Date.now();
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
-            text: type.includes('Text') ? 'New Text' : '',
+            text: type.includes('Text') ? 'Metin' : '',
             icon: type === 'ImageLabel' ? '6031075929' : '',
             tColor: '#ffffff', tSize: 18,
             c1: '#2a2a2a', c2: '#1a1a1a', transparent: type === 'TextLabel',
@@ -129,7 +151,7 @@
         const copy = JSON.parse(JSON.stringify(original));
         copy.id = "el_" + Date.now();
         copy.name = original.name + "_Copy";
-        copy.x += 25; copy.y += 25;
+        copy.x += 30; copy.y += 30;
         elements.push(copy);
         select(copy.id);
     }
@@ -138,12 +160,11 @@
         const view = document.getElementById('viewport');
         view.innerHTML = '';
         const list = document.getElementById('layer-list');
-        list.innerHTML = '';
+        if (list) list.innerHTML = '';
 
         elements.sort((a,b) => a.z - b.z).forEach(el => {
             const div = document.createElement('div');
-            const typeClass = el.type === 'TextButton' ? 'is-button' : 'is-frame';
-            div.className = `ui-element ${typeClass} ${selectedId === el.id ? 'selected' : ''}`;
+            div.className = `ui-element ${el.type === 'TextButton' ? 'is-button' : ''} ${selectedId === el.id ? 'selected' : ''}`;
             
             let bg = el.transparent ? 'transparent' : `linear-gradient(180deg, ${el.c1}, ${el.c2})`;
             let stroke = el.sThick > 0 ? `border: ${el.sThick}px solid ${el.sColor};` : '';
@@ -156,7 +177,6 @@
                 img.className = 'icon-img';
                 div.appendChild(img);
             }
-
             if(el.text) div.innerHTML += `<span>${el.text}</span>`;
 
             if(!isTestMode) {
@@ -169,11 +189,13 @@
             }
             view.appendChild(div);
 
-            const li = document.createElement('div');
-            li.className = `layer-item ${selectedId === el.id ? 'active' : ''}`;
-            li.innerText = el.name;
-            li.onclick = () => select(el.id);
-            list.insertBefore(li, list.firstChild);
+            if (list) {
+                const li = document.createElement('div');
+                li.className = `layer-item ${selectedId === el.id ? 'active' : ''}`;
+                li.innerText = el.name;
+                li.onclick = () => select(el.id);
+                list.insertBefore(li, list.firstChild);
+            }
         });
     }
 
@@ -181,24 +203,26 @@
         if(isTestMode) return;
         selectedId = id;
         const el = elements.find(e => e.id === id);
-        const inputs = document.getElementById('prop-inputs');
-        if(el) {
-            inputs.style.display = 'block';
-            document.getElementById('p-text').value = el.text;
-            document.getElementById('p-icon').value = el.icon;
-            document.getElementById('p-c1').value = el.c1;
-            document.getElementById('p-c2').value = el.c2;
-            document.getElementById('p-tcolor').value = el.tColor;
-            document.getElementById('p-tsize').value = el.tSize;
-            document.getElementById('p-trans').checked = el.transparent;
-            document.getElementById('p-scolor').value = el.sColor;
-            document.getElementById('p-sthick').value = el.sThick;
-            document.getElementById('p-z').value = el.z;
-            document.getElementById('p-radius').value = el.radius;
-            document.getElementById('p-w').value = el.w;
-            document.getElementById('p-h').value = el.h;
-        } else {
-            inputs.style.display = 'none';
+        const panel = document.getElementById('prop-inputs');
+        
+        if(el && panel) {
+            panel.style.display = 'block';
+            setVal('p-name', el.name);
+            setVal('p-text', el.text);
+            setVal('p-icon', el.icon);
+            setVal('p-c1', el.c1);
+            setVal('p-c2', el.c2);
+            setVal('p-tcolor', el.tColor);
+            setVal('p-tsize', el.tSize);
+            setVal('p-trans', el.transparent);
+            setVal('p-scolor', el.sColor);
+            setVal('p-sthick', el.sThick);
+            setVal('p-z', el.z);
+            setVal('p-radius', el.radius);
+            setVal('p-w', el.w);
+            setVal('p-h', el.h);
+        } else if (panel) {
+            panel.style.display = 'none';
         }
         render();
     }
@@ -206,19 +230,22 @@
     function apply() {
         const el = elements.find(e => e.id === selectedId);
         if(!el) return;
-        el.text = document.getElementById('p-text').value;
-        el.icon = document.getElementById('p-icon').value;
-        el.c1 = document.getElementById('p-c1').value;
-        el.c2 = document.getElementById('p-c2').value;
-        el.tColor = document.getElementById('p-tcolor').value;
-        el.tSize = parseInt(document.getElementById('p-tsize').value) || 14;
-        el.transparent = document.getElementById('p-trans').checked;
-        el.sColor = document.getElementById('p-scolor').value;
-        el.sThick = parseInt(document.getElementById('p-sthick').value) || 0;
-        el.z = parseInt(document.getElementById('p-z').value) || 0;
-        el.radius = parseInt(document.getElementById('p-radius').value) || 0;
-        el.w = parseInt(document.getElementById('p-w').value) || 30;
-        el.h = parseInt(document.getElementById('p-h').value) || 20;
+        
+        el.name = getVal('p-name');
+        el.text = getVal('p-text');
+        el.icon = getVal('p-icon');
+        el.c1 = getVal('p-c1');
+        el.c2 = getVal('p-c2');
+        el.tColor = getVal('p-tcolor');
+        el.tSize = getVal('p-tsize', true);
+        el.transparent = getVal('p-trans', false, true);
+        el.sColor = getVal('p-scolor');
+        el.sThick = getVal('p-sthick', true);
+        el.z = getVal('p-z', true);
+        el.radius = getVal('p-radius', true);
+        el.w = getVal('p-w', true);
+        el.h = getVal('p-h', true);
+        
         render();
     }
 
@@ -262,8 +289,8 @@
     }
 
     function exportLua() {
-        alert("Kod konsola (F12) yazdırıldı!");
         console.log("-- Roblox UI Export --");
+        alert("Kod Konsola Yazıldı!");
     }
 
     render();
