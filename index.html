@@ -2,12 +2,11 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox UI Titan v2.8 - TextScaled Fixed</title>
+    <title>Roblox UI Titan v2.9 - Smart Text Fit</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; --accent: #2ecc71; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* PANELLER */
         .sidebar { width: 240px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 100; flex-shrink: 0; }
         .properties { width: 330px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; height: 100vh; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; box-sizing: border-box; padding-bottom: 40px; }
         .workspace { flex-grow: 1; background-color: #111; position: relative; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; }
@@ -17,7 +16,6 @@
             transform: scale(0.65); transform-origin: top center; box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
-        /* ELEMENTLER */
         .ui-element { 
             position: absolute; display: flex; align-items: center; justify-content: center; 
             cursor: grab; box-sizing: border-box; text-align: center; overflow: hidden; 
@@ -25,17 +23,19 @@
         .ui-element.selected { outline: 2px solid var(--primary); outline-offset: 4px; z-index: 999 !important; }
         .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); border-radius: 2px; z-index: 10; }
         
-        /* DÜZELTİLMİŞ TEXT SCALED */
+        /* SMART FIT CONTAINER */
         .scaled-text-container {
-            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            padding: 2px; pointer-events: none;
+            width: 90%; height: 90%; /* Kenarlardan %5 boşluk */
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none;
         }
         .scaled-text-inner {
-            font-size: min(100vh, 100vw); /* Dinamik hesaplama için temel */
-            line-height: 1; width: 100%; text-align: center;
+            line-height: 1.1; 
+            width: 100%; 
+            display: inline-block;
+            word-wrap: break-word; /* Çok uzun kelimeleri kırar */
         }
 
-        /* BUTON ANİMASYONLARI */
         .is-button { transition: transform 0.1s, filter 0.1s; cursor: pointer; }
         .is-button:hover { filter: brightness(1.2); }
         .is-button:active { transform: scale(0.92) !important; }
@@ -61,7 +61,7 @@
 
     <div id="code-modal">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:15px;">
-            <h2 style="margin:0; color:var(--primary);">📜 Generated Lua Script</h2>
+            <h2 style="margin:0; color:var(--primary);">📜 Lua Code (F10)</h2>
             <button onclick="closeConsole()" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">&times;</button>
         </div>
         <div id="lua-code-area"></div>
@@ -71,11 +71,10 @@
     <div class="sidebar">
         <button onclick="toggleTestMode(true)" style="background:#f1c40f; color:black; margin-bottom:10px;" class="btn-main">▶ TEST MODU</button>
         <button onclick="addElement('Frame')" class="btn-main" style="background:#333;">🖼️ Frame</button>
-        <button onclick="addElement('TextButton')" class="btn-main" style="background:#333;">🔘 TextButton</button>
-        <button onclick="addElement('TextLabel')" class="btn-main" style="background:#333;">📄 TextLabel</button>
-        <button onclick="addElement('ImageLabel')" class="btn-main" style="background:#333;">🖼️ ImageLabel</button>
-        <h3 style="margin-top:20px; font-size: 0.9rem; color: #666;">KATMANLAR</h3>
-        <div id="layer-list"></div>
+        <button onclick="addElement('TextButton')" class="btn-main" style="background:#333;">🔘 Button</button>
+        <button onclick="addElement('TextLabel')" class="btn-main" style="background:#333;">📄 Label</button>
+        <button onclick="addElement('ImageLabel')" class="btn-main" style="background:#333;">🖼️ Image</button>
+        <div id="layer-list" style="margin-top:20px;"></div>
     </div>
 
     <div class="workspace" onclick="select(null)">
@@ -88,20 +87,15 @@
             <div class="prop-group">
                 <label>İsim & Metin</label>
                 <input type="text" id="p-name" oninput="apply()" style="margin-bottom:8px;">
-                <input type="text" id="p-text" oninput="apply()">
-            </div>
-            <div class="prop-group">
-                <label>Görsel (Image ID)</label>
-                <input type="text" id="p-icon" oninput="apply()">
+                <input type="text" id="p-text" oninput="apply()" placeholder="Uzun bir yazı yazın...">
             </div>
             <div class="prop-group">
                 <label>Yazı Fontu & Boyutu</label>
                 <select id="p-font" onchange="apply()" style="margin-bottom:8px;">
                     <option value="Arial">Arial</option>
-                    <option value="Gotham">Gotham</option>
                     <option value="GothamBold">GothamBold</option>
-                    <option value="Arcade">Arcade</option>
                     <option value="LuckiestGuy">LuckiestGuy</option>
+                    <option value="Arcade">Arcade</option>
                 </select>
                 <div style="display:flex; gap:8px;">
                     <input type="color" id="p-tcolor" oninput="apply()">
@@ -109,14 +103,14 @@
                 </div>
                 <div style="margin-top:8px; display:flex; align-items:center; gap:5px;">
                     <input type="checkbox" id="p-tscaled" onchange="apply()" style="width:16px;"> 
-                    <span style="font-size:0.7rem;">TextScaled (Sığdır)</span>
+                    <span style="font-size:0.75rem; font-weight:bold; color:var(--primary);">TextScaled (Smart Fit)</span>
                 </div>
             </div>
             <div class="prop-group">
                 <label>Görünüm</label>
                 <div style="display:flex; gap:8px; margin-bottom:8px;">
                     <input type="color" id="p-c1" oninput="apply()">
-                    <input type="checkbox" id="p-trans" onchange="apply()" style="width:16px;"> <span>Şeffaf</span>
+                    <input type="checkbox" id="p-trans" onchange="apply()"> <span>Şeffaf</span>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                     <div><label>Radius</label><input type="number" id="p-radius" oninput="apply()"></div>
@@ -136,9 +130,9 @@
 
     window.addEventListener('keydown', (e) => { if (e.key === 'F10') { e.preventDefault(); generateLua(); } });
 
-    function save() { localStorage.setItem('titan_ui_v28', JSON.stringify(elements)); }
+    function save() { localStorage.setItem('titan_ui_v29', JSON.stringify(elements)); }
     function load() { 
-        const d = localStorage.getItem('titan_ui_v28');
+        const d = localStorage.getItem('titan_ui_v29');
         if(d) { elements = JSON.parse(d); render(); }
     }
 
@@ -146,15 +140,25 @@
         let id = "el_" + Math.floor(Math.random()*100000);
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
-            text: type.includes('Text') ? 'YAZI' : '',
+            text: type.includes('Text') ? 'Örnek Metin' : '',
             icon: type === 'ImageLabel' ? '6031075929' : '',
-            font: 'Gotham', tSize: 18, tColor: '#ffffff', tScaled: false,
+            font: 'GothamBold', tSize: 18, tColor: '#ffffff', tScaled: true,
             c1: '#333333', transparent: (type === 'TextLabel'),
             sColor: '#00a2ff', sThick: 0,
-            w: 180, h: 60, x: 100, y: 100, radius: 8, z: elements.length + 1
+            w: 200, h: 60, x: 100, y: 100, radius: 8, z: elements.length + 1
         });
         select(id);
         save();
+    }
+
+    function calculateFitFontSize(text, width, height) {
+        // Metin uzunluğuna göre yaklaşık bir çarpan (karakter başına genişlik)
+        let charCount = text.length || 1;
+        let sizeBasedOnWidth = (width / charCount) * 1.8; // Genişliğe göre max font
+        let sizeBasedOnHeight = height * 0.75; // Yüksekliğe göre max font
+        
+        // İkisinden küçük olanı seç ki ekrandan taşmasın
+        return Math.min(sizeBasedOnWidth, sizeBasedOnHeight);
     }
 
     function render() {
@@ -170,10 +174,8 @@
             
             let bg = el.transparent ? 'transparent' : el.c1;
             let stroke = el.sThick > 0 ? `border: ${el.sThick}px solid ${el.sColor};` : '';
-            let radius = el.radius > 0 ? `border-radius: ${el.radius}px;` : '';
-            
-            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; background:${bg}; color:${el.tColor}; ${stroke} ${radius}`;
-            div.style.fontFamily = el.font.includes('Gotham') ? 'sans-serif' : el.font;
+            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; background:${bg}; color:${el.tColor}; ${stroke} border-radius:${el.radius}px;`;
+            div.style.fontFamily = el.font === 'LuckiestGuy' ? 'cursive' : 'sans-serif';
 
             if(el.type === 'ImageLabel' && el.icon) {
                 const img = document.createElement('img');
@@ -185,15 +187,12 @@
             if(el.text) {
                 const container = document.createElement('div');
                 container.className = "scaled-text-container";
-                
                 const inner = document.createElement('div');
                 inner.className = "scaled-text-inner";
                 inner.innerText = el.text;
                 
                 if(el.tScaled) {
-                    // Kutunun boyutuna göre fontu %80 oranında büyüt
-                    let fontSize = Math.min(el.w, el.h) * 0.8;
-                    inner.style.fontSize = fontSize + "px";
+                    inner.style.fontSize = calculateFitFontSize(el.text, el.w, el.h) + "px";
                 } else {
                     inner.style.fontSize = el.tSize + "px";
                 }
@@ -227,7 +226,6 @@
             panel.style.display = 'block';
             document.getElementById('p-name').value = el.name;
             document.getElementById('p-text').value = el.text;
-            document.getElementById('p-icon').value = el.icon || '';
             document.getElementById('p-font').value = el.font;
             document.getElementById('p-tcolor').value = el.tColor;
             document.getElementById('p-tsize').value = el.tSize;
@@ -245,7 +243,6 @@
         if(!el) return;
         el.name = document.getElementById('p-name').value;
         el.text = document.getElementById('p-text').value;
-        el.icon = document.getElementById('p-icon').value;
         el.font = document.getElementById('p-font').value;
         el.tColor = document.getElementById('p-tcolor').value;
         el.tSize = parseInt(document.getElementById('p-tsize').value) || 14;
@@ -254,8 +251,7 @@
         el.transparent = document.getElementById('p-trans').checked;
         el.radius = parseInt(document.getElementById('p-radius').value) || 0;
         el.sThick = parseInt(document.getElementById('p-sthick').value) || 0;
-        render();
-        save();
+        render(); save();
     }
 
     function startDrag(e, el) {
@@ -278,7 +274,7 @@
     }
 
     function generateLua() {
-        let code = `-- [ Roblox UI Titan v2.8 ] --\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)\nsg.ResetOnSpawn = false\n`;
+        let code = `-- [ v2.9 Smart Fit ] --\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)\n`;
         elements.forEach(el => {
             code += `\nlocal ${el.id} = Instance.new("${el.type}", sg)\n`;
             code += `${el.id}.Size = UDim2.new(0, ${Math.round(el.w)}, 0, ${Math.round(el.h)})\n`;
@@ -286,10 +282,6 @@
             if(el.text) {
                 code += `${el.id}.Text = "${el.text}"\n`;
                 code += `${el.id}.TextScaled = ${el.tScaled}\n`;
-                code += `${el.id}.Font = Enum.Font.${el.font}\n`;
-            }
-            if(el.radius > 0) {
-                code += `Instance.new("UICorner", ${el.id}).CornerRadius = UDim.new(0, ${el.radius})\n`;
             }
         });
         document.getElementById('lua-code-area').innerText = code;
@@ -306,7 +298,7 @@
         copy.id = "el_" + Math.floor(Math.random()*100000);
         copy.x += 20; copy.y += 20; elements.push(copy); select(copy.id); save();
     }
-    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('lua-code-area').innerText).then(() => alert("Kopyalandı!")); }
+    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('lua-code-area').innerText).then(() => alert("Lua kodu kopyalandı!")); }
 
     load();
 </script>
