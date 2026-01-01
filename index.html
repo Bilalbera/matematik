@@ -2,46 +2,54 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox UI Titan v4.7 - FULL & FIXED</title>
+    <title>Roblox UI Titan v5.0 - THE ULTIMATE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Press+Start+2P&family=Bangers&family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; --accent: #2ecc71; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        .sidebar { width: 220px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-        .properties { width: 340px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        /* Layout */
+        .sidebar { width: 200px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+        .properties { width: 360px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; }
         .workspace { flex-grow: 1; background-color: #111; position: relative; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
-        .roblox-screen { width: 1280px; height: 720px; background: #000; border: 4px solid #444; position: relative; transform: scale(0.6); transform-origin: top center; }
+        /* Viewport */
+        .roblox-screen { width: 1280px; height: 720px; background: #000; border: 4px solid #444; position: relative; transform: scale(0.6); transform-origin: top center; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
 
+        /* UI Element */
         .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; box-sizing: border-box; text-align: center; }
-        .ui-element.selected { outline: 2px solid var(--primary); outline-offset: 4px; z-index: 999 !important; }
-        .resizer { width: 12px; height: 12px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); z-index: 50; }
+        .ui-element.selected { outline: 3px solid var(--primary); outline-offset: 2px; z-index: 1000 !important; }
+        .resizer { width: 14px; height: 14px; background: white; position: absolute; right: -7px; bottom: -7px; cursor: nwse-resize; border: 2px solid var(--primary); border-radius: 50%; z-index: 1001; }
         
-        #code-modal { position: fixed; right: -650px; top: 0; width: 600px; height: 100vh; background: #111; border-left: 3px solid var(--primary); z-index: 2000; transition: 0.3s; padding: 20px; display: flex; flex-direction: column; }
+        /* UI Components */
+        #code-modal { position: fixed; right: -700px; top: 0; width: 650px; height: 100vh; background: #111; border-left: 4px solid var(--primary); z-index: 3000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 25px; display: flex; flex-direction: column; }
         #code-modal.open { right: 0; }
-        #lua-code-area { flex-grow: 1; background: #050505; color: #dcdcaa; padding: 15px; border-radius: 8px; font-family: 'Consolas', monospace; font-size: 11px; overflow: auto; white-space: pre; border: 1px solid #333; }
+        #lua-code-area { flex-grow: 1; background: #050505; color: #dcdcaa; padding: 15px; border-radius: 8px; font-family: 'Consolas', monospace; font-size: 12px; overflow: auto; white-space: pre; border: 1px solid #333; line-height: 1.5; }
         
-        .prop-group { background: #222; padding: 10px; border-radius: 6px; border: 1px solid #333; }
-        .prop-group label { display: block; font-size: 0.6rem; color: #aaa; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
-        input, select { width: 100%; background: #111; border: 1px solid #444; color: white; padding: 6px; border-radius: 4px; font-size: 0.8rem; margin-bottom: 5px; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
-        .btn-main:hover { filter: brightness(1.1); }
+        /* Inputs */
+        .prop-group { background: #222; padding: 12px; border-radius: 8px; border: 1px solid #333; }
+        .prop-group label { display: block; font-size: 0.65rem; color: #888; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; background: #111; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; font-size: 0.85rem; margin-bottom: 5px; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        .btn-main:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .flex-row { display: flex; gap: 8px; align-items: center; }
     </style>
 </head>
 <body>
 
     <div id="code-modal">
-        <h2 style="color:var(--primary); margin:0;">🚀 FULL LUA CODE</h2>
+        <h2 style="color:var(--primary); margin:0 0 10px 0;">💎 ULTIMATE LUA CODE</h2>
         <div id="lua-code-area"></div>
-        <button onclick="copyToClipboard()" class="btn-main" style="margin-top:10px; background:var(--accent);">📋 KOPYALA</button>
+        <button onclick="copyToClipboard()" class="btn-main" style="margin-top:15px; background:var(--accent);">📋 KODU KOPYALA</button>
         <button onclick="closeConsole()" class="btn-main" style="margin-top:10px; background:#444;">KAPAT</button>
     </div>
 
     <div class="sidebar">
-        <button onclick="addElement('Frame')" class="btn-main">🖼️ Alt Frame</button>
-        <button onclick="addElement('TextButton')" class="btn-main">🔘 Buton</button>
-        <button onclick="addElement('TextLabel')" class="btn-main">📄 Yazı</button>
-        <button onclick="addElement('ImageLabel')" class="btn-main">🖼️ Resim</button>
+        <h3 style="color:var(--primary); font-size:14px; text-align:center;">EKLE</h3>
+        <button onclick="addElement('Frame')" class="btn-main" style="background:#333;">🖼️ Frame</button>
+        <button onclick="addElement('TextButton')" class="btn-main" style="background:#333;">🔘 Button</button>
+        <button onclick="addElement('TextLabel')" class="btn-main" style="background:#333;">📄 Label</button>
+        <button onclick="addElement('ImageLabel')" class="btn-main" style="background:#333;">🖼️ Image</button>
     </div>
 
     <div class="workspace" onclick="select(null)">
@@ -49,43 +57,60 @@
     </div>
 
     <div class="properties">
+        <h3 style="margin:0; font-size:16px; color:var(--primary);">ÖZELLİKLER</h3>
         <div id="prop-inputs" style="display:none;">
             <div class="prop-group">
-                <label>İsim & Metin</label>
-                <input type="text" id="p-name" oninput="apply()">
+                <label>Obje & Metin</label>
+                <input type="text" id="p-name" oninput="apply()" placeholder="Objenin Adı">
                 <input type="text" id="p-text" oninput="apply()" placeholder="Yazı İçeriği">
-                <div style="display:flex; align-items:center; gap:5px;">
-                    <input type="checkbox" id="p-tscaled" onchange="apply()" style="width:14px;"> <span>TextScaled</span>
+                <div class="flex-row">
+                    <input type="checkbox" id="p-tscaled" onchange="apply()" style="width:18px; height:18px;">
+                    <span style="font-size:0.8rem;">TextScaled (Aktif)</span>
                 </div>
             </div>
+
             <div class="prop-group">
-                <label>Font & Renk</label>
+                <label>Font & Yazı Rengi</label>
                 <select id="p-font" onchange="apply()">
-                    <option value="LuckiestGuy">LuckiestGuy</option>
-                    <option value="GothamBold">GothamBold</option>
-                    <option value="Arcade">Arcade</option>
-                    <option value="SciFi">SciFi</option>
+                    <option value="LuckiestGuy">Luckiest Guy</option>
+                    <option value="GothamBold">Gotham Bold</option>
+                    <option value="Arcade">Arcade (Start 2P)</option>
+                    <option value="Bangers">Bangers</option>
+                    <option value="SciFi">SciFi (Roboto Mono)</option>
                 </select>
                 <input type="color" id="p-tcolor" oninput="apply()" title="Yazı Rengi">
             </div>
+
             <div class="prop-group">
-                <label>Arka Plan & Gradient</label>
-                <div style="display:flex; gap:5px;">
+                <label>Arkaplan & Gradient</label>
+                <div class="flex-row">
                     <input type="color" id="p-c1" oninput="apply()">
                     <input type="color" id="p-c2" oninput="apply()">
                 </div>
-                <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
-                    <input type="checkbox" id="p-grad-on" onchange="apply()" style="width:14px;"> <span>Gradient Aktif</span>
+                <div class="flex-row" style="margin-top:8px;">
+                    <input type="checkbox" id="p-grad-on" onchange="apply()" style="width:18px; height:18px;">
+                    <span style="font-size:0.8rem;">Gradient Aktif</span>
                 </div>
+                <input type="range" id="p-grad-rot" min="0" max="360" oninput="apply()" style="margin-top:5px;">
             </div>
+
             <div class="prop-group">
-                <label>Asset & Köşe</label>
-                <input type="text" id="p-icon" oninput="apply()" placeholder="Image ID (rbxassetid://)">
-                <input type="number" id="p-radius" oninput="apply()" placeholder="Corner Radius (UICorner)">
+                <label>Corner & Stroke (Kenarlık)</label>
+                <div class="flex-row">
+                    <input type="number" id="p-radius" oninput="apply()" placeholder="Corner Radius">
+                    <input type="number" id="p-sthick" oninput="apply()" placeholder="Stroke Kalınlık">
+                </div>
+                <input type="color" id="p-scolor" oninput="apply()" title="Stroke Rengi" style="margin-top:5px;">
             </div>
-            <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; margin-bottom:5px;">👥 KOPYALA</button>
+
+            <div class="prop-group">
+                <label>Resim (ImageLabel)</label>
+                <input type="text" id="p-icon" oninput="apply()" placeholder="Asset ID: 6031075929">
+            </div>
+
+            <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; margin-bottom:8px;">👥 KOPYALA (Duplicate)</button>
             <button onclick="generateLua()" class="btn-main" style="background:var(--accent);">📥 KODU AL (F10)</button>
-            <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c; margin-top:5px;">🗑️ SİL</button>
+            <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c; margin-top:8px;">🗑️ SİL</button>
         </div>
     </div>
 
@@ -93,13 +118,23 @@
     let elements = [];
     let selectedId = null;
 
+    const fontMap = {
+        'LuckiestGuy': "'Luckiest Guy', cursive",
+        'GothamBold': "sans-serif",
+        'Arcade': "'Press Start 2P', cursive",
+        'Bangers': "'Bangers', cursive",
+        'SciFi': "'Roboto Mono', monospace"
+    };
+
     function addElement(type) {
         let id = "el_" + Math.floor(Math.random()*100000);
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
-            text: 'METIN', icon: '6031075929', font: 'LuckiestGuy', tSize: 20, tColor: '#ffffff', tScaled: true,
-            c1: '#333333', c2: '#111111', gradOn: false, radius: 8,
-            w: 150, h: 50, x: 100, y: 100, z: elements.length + 1
+            text: type.includes('Text') || type === 'TextButton' ? 'METIN' : '',
+            icon: '6031075929', font: 'LuckiestGuy', tSize: 20, tColor: '#ffffff', tScaled: true,
+            c1: '#333333', c2: '#111111', gradOn: false, gradRot: 90,
+            radius: 8, sThick: 0, sColor: '#00a2ff',
+            w: 160, h: 50, x: 100, y: 100, z: elements.length + 1
         });
         select(id); render();
     }
@@ -109,15 +144,17 @@
         elements.forEach(el => {
             const div = document.createElement('div');
             div.className = `ui-element ${selectedId === el.id ? 'selected' : ''}`;
-            let bg = el.gradOn ? `linear-gradient(180deg, ${el.c1}, ${el.c2})` : el.c1;
+            let bg = el.gradOn ? `linear-gradient(${el.gradRot}deg, ${el.c1}, ${el.c2})` : el.c1;
             div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; background:${bg}; border-radius:${el.radius}px; z-index:${el.z};`;
             
+            if(el.sThick > 0) div.style.boxShadow = `0 0 0 ${el.sThick}px ${el.sColor}`;
+
             if(el.type === 'ImageLabel') {
                 div.innerHTML = `<img src="https://www.roblox.com/asset-thumbnail/image?assetId=${el.icon}&width=420&height=420&format=png" style="width:100%; height:100%; object-fit:contain; pointer-events:none;">`;
-            } else {
+            } else if(el.text) {
                 const txt = document.createElement('div');
                 txt.innerText = el.text;
-                txt.style = `color:${el.tColor}; width:90%; font-family:sans-serif; font-weight:bold;`;
+                txt.style = `color:${el.tColor}; width:95%; font-family:${fontMap[el.font]};`;
                 txt.style.fontSize = el.tScaled ? (el.h * 0.5) + "px" : el.tSize + "px";
                 div.appendChild(txt);
             }
@@ -133,18 +170,23 @@
 
     function select(id) {
         selectedId = id; const el = elements.find(e => e.id === id);
+        const panel = document.getElementById('prop-inputs');
         if(el) {
-            document.getElementById('prop-inputs').style.display = 'block';
+            panel.style.display = 'block';
             document.getElementById('p-name').value = el.name;
             document.getElementById('p-text').value = el.text;
+            document.getElementById('p-font').value = el.font;
             document.getElementById('p-tcolor').value = el.tColor;
             document.getElementById('p-tscaled').checked = el.tScaled;
             document.getElementById('p-grad-on').checked = el.gradOn;
+            document.getElementById('p-grad-rot').value = el.gradRot;
             document.getElementById('p-c1').value = el.c1;
             document.getElementById('p-c2').value = el.c2;
             document.getElementById('p-radius').value = el.radius;
+            document.getElementById('p-sthick').value = el.sThick;
+            document.getElementById('p-scolor').value = el.sColor;
             document.getElementById('p-icon').value = el.icon;
-        } else document.getElementById('prop-inputs').style.display = 'none';
+        } else panel.style.display = 'none';
         render();
     }
 
@@ -152,13 +194,16 @@
         const el = elements.find(e => e.id === selectedId); if(!el) return;
         el.name = document.getElementById('p-name').value;
         el.text = document.getElementById('p-text').value;
-        el.tColor = document.getElementById('p-tcolor').value;
         el.font = document.getElementById('p-font').value;
+        el.tColor = document.getElementById('p-tcolor').value;
         el.tScaled = document.getElementById('p-tscaled').checked;
         el.gradOn = document.getElementById('p-grad-on').checked;
+        el.gradRot = document.getElementById('p-grad-rot').value;
         el.c1 = document.getElementById('p-c1').value;
         el.c2 = document.getElementById('p-c2').value;
         el.radius = parseInt(document.getElementById('p-radius').value) || 0;
+        el.sThick = parseInt(document.getElementById('p-sthick').value) || 0;
+        el.sColor = document.getElementById('p-scolor').value;
         el.icon = document.getElementById('p-icon').value;
         render();
     }
@@ -185,22 +230,26 @@
         if(elements.length === 0) return;
         let minX = Math.min(...elements.map(e => e.x));
         let minY = Math.min(...elements.map(e => e.y));
-        let code = `-- [[ TITAN UI v4.7 FINAL ]] --\nlocal MainFrame = script.Parent\n`;
+        let code = `-- [[ TITAN UI ENGINE v5.0 ]] --\nlocal ParentFrame = script.Parent\n`;
         
         elements.forEach(el => {
-            code += `\n-- ${el.name}\nlocal ${el.id} = Instance.new("${el.type}", MainFrame)\n`;
+            code += `\n-- // ${el.name}\nlocal ${el.id} = Instance.new("${el.type}", ParentFrame)\n`;
             code += `${el.id}.Name = "${el.name}"\n`;
             code += `${el.id}.Size = UDim2.new(0, ${Math.round(el.w)}, 0, ${Math.round(el.h)})\n`;
             code += `${el.id}.Position = UDim2.new(0, ${Math.round(el.x - minX)}, 0, ${Math.round(el.y - minY)})\n`;
             code += `${el.id}.BackgroundColor3 = Color3.fromHex("${el.c1}")\n`;
-            if(el.type !== 'Frame') {
+            
+            if(el.text) {
                 code += `${el.id}.Text = "${el.text}"\n${el.id}.Font = Enum.Font.${el.font}\n${el.id}.TextScaled = ${el.tScaled}\n`;
                 code += `${el.id}.TextColor3 = Color3.fromHex("${el.tColor}")\n`;
             }
             if(el.type === 'ImageLabel') code += `${el.id}.Image = "rbxassetid://${el.icon}"\n`;
             if(el.radius > 0) code += `Instance.new("UICorner", ${el.id}).CornerRadius = UDim.new(0, ${el.radius})\n`;
+            if(el.sThick > 0) {
+                code += `local s = Instance.new("UIStroke", ${el.id})\ns.Thickness = ${el.sThick}\ns.Color = Color3.fromHex("${el.sColor}")\n`;
+            }
             if(el.gradOn) {
-                code += `local g = Instance.new("UIGradient", ${el.id})\ng.Color = ColorSequence.new(Color3.fromHex("${el.c1}"), Color3.fromHex("${el.c2}"))\n`;
+                code += `local g = Instance.new("UIGradient", ${el.id})\ng.Color = ColorSequence.new(Color3.fromHex("${el.c1}"), Color3.fromHex("${el.c2}"))\ng.Rotation = ${el.gradRot}\n`;
             }
         });
         document.getElementById('lua-code-area').innerText = code;
