@@ -2,11 +2,12 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox UI Titan v2.9 - Smart Text Fit</title>
+    <title>Roblox UI Titan v3.0 - Gradient Reborn</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; --accent: #2ecc71; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
+        /* PANELLER */
         .sidebar { width: 240px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 100; flex-shrink: 0; }
         .properties { width: 330px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; height: 100vh; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; box-sizing: border-box; padding-bottom: 40px; }
         .workspace { flex-grow: 1; background-color: #111; position: relative; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; }
@@ -16,26 +17,16 @@
             transform: scale(0.65); transform-origin: top center; box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
-        .ui-element { 
-            position: absolute; display: flex; align-items: center; justify-content: center; 
-            cursor: grab; box-sizing: border-box; text-align: center; overflow: hidden; 
-        }
+        /* ELEMENTLER */
+        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; box-sizing: border-box; text-align: center; overflow: hidden; }
         .ui-element.selected { outline: 2px solid var(--primary); outline-offset: 4px; z-index: 999 !important; }
         .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); border-radius: 2px; z-index: 10; }
         
-        /* SMART FIT CONTAINER */
-        .scaled-text-container {
-            width: 90%; height: 90%; /* Kenarlardan %5 boşluk */
-            display: flex; align-items: center; justify-content: center;
-            pointer-events: none;
-        }
-        .scaled-text-inner {
-            line-height: 1.1; 
-            width: 100%; 
-            display: inline-block;
-            word-wrap: break-word; /* Çok uzun kelimeleri kırar */
-        }
+        /* TEXT SCALING */
+        .scaled-text-container { width: 90%; height: 90%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+        .scaled-text-inner { line-height: 1.1; width: 100%; word-wrap: break-word; }
 
+        /* BUTON ANİMASYONLARI */
         .is-button { transition: transform 0.1s, filter 0.1s; cursor: pointer; }
         .is-button:hover { filter: brightness(1.2); }
         .is-button:active { transform: scale(0.92) !important; }
@@ -61,7 +52,7 @@
 
     <div id="code-modal">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:15px;">
-            <h2 style="margin:0; color:var(--primary);">📜 Lua Code (F10)</h2>
+            <h2 style="margin:0; color:var(--primary);">📜 Lua Script (F10)</h2>
             <button onclick="closeConsole()" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">&times;</button>
         </div>
         <div id="lua-code-area"></div>
@@ -87,36 +78,35 @@
             <div class="prop-group">
                 <label>İsim & Metin</label>
                 <input type="text" id="p-name" oninput="apply()" style="margin-bottom:8px;">
-                <input type="text" id="p-text" oninput="apply()" placeholder="Uzun bir yazı yazın...">
-            </div>
-            <div class="prop-group">
-                <label>Yazı Fontu & Boyutu</label>
-                <select id="p-font" onchange="apply()" style="margin-bottom:8px;">
-                    <option value="Arial">Arial</option>
-                    <option value="GothamBold">GothamBold</option>
-                    <option value="LuckiestGuy">LuckiestGuy</option>
-                    <option value="Arcade">Arcade</option>
-                </select>
-                <div style="display:flex; gap:8px;">
-                    <input type="color" id="p-tcolor" oninput="apply()">
-                    <input type="number" id="p-tsize" oninput="apply()">
-                </div>
+                <input type="text" id="p-text" oninput="apply()">
                 <div style="margin-top:8px; display:flex; align-items:center; gap:5px;">
                     <input type="checkbox" id="p-tscaled" onchange="apply()" style="width:16px;"> 
-                    <span style="font-size:0.75rem; font-weight:bold; color:var(--primary);">TextScaled (Smart Fit)</span>
+                    <span style="font-size:0.75rem; color:var(--primary);">TextScaled (Smart)</span>
                 </div>
             </div>
+
             <div class="prop-group">
-                <label>Görünüm</label>
-                <div style="display:flex; gap:8px; margin-bottom:8px;">
-                    <input type="color" id="p-c1" oninput="apply()">
-                    <input type="checkbox" id="p-trans" onchange="apply()"> <span>Şeffaf</span>
+                <label>Renk Geçişi (Gradient)</label>
+                <div style="display:flex; align-items:center; gap:5px; margin-bottom:8px;">
+                    <input type="checkbox" id="p-grad-on" onchange="apply()" style="width:16px;"> 
+                    <span style="font-size:0.75rem;">Gradient Aktif</span>
                 </div>
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                    <div><label>Renk 1</label><input type="color" id="p-c1" oninput="apply()"></div>
+                    <div><label>Renk 2</label><input type="color" id="p-c2" oninput="apply()"></div>
+                </div>
+                <label>Dönüş Açısı (Rotation)</label>
+                <input type="range" id="p-grad-rot" min="0" max="360" value="90" oninput="apply()">
+            </div>
+
+            <div class="prop-group">
+                <label>Görünüm & Yuvarlaklık</label>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                     <div><label>Radius</label><input type="number" id="p-radius" oninput="apply()"></div>
                     <div><label>Stroke</label><input type="number" id="p-sthick" oninput="apply()"></div>
                 </div>
             </div>
+
             <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; margin-bottom:8px;">👥 KOPYALA</button>
             <button onclick="generateLua()" class="btn-main" style="background:var(--accent);">📥 LUA KODU (F10)</button>
             <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c; margin-top:8px;">🗑️ SİL</button>
@@ -130,9 +120,9 @@
 
     window.addEventListener('keydown', (e) => { if (e.key === 'F10') { e.preventDefault(); generateLua(); } });
 
-    function save() { localStorage.setItem('titan_ui_v29', JSON.stringify(elements)); }
+    function save() { localStorage.setItem('titan_ui_v30', JSON.stringify(elements)); }
     function load() { 
-        const d = localStorage.getItem('titan_ui_v29');
+        const d = localStorage.getItem('titan_ui_v30');
         if(d) { elements = JSON.parse(d); render(); }
     }
 
@@ -140,25 +130,15 @@
         let id = "el_" + Math.floor(Math.random()*100000);
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
-            text: type.includes('Text') ? 'Örnek Metin' : '',
+            text: type.includes('Text') ? 'Metin' : '',
             icon: type === 'ImageLabel' ? '6031075929' : '',
             font: 'GothamBold', tSize: 18, tColor: '#ffffff', tScaled: true,
-            c1: '#333333', transparent: (type === 'TextLabel'),
-            sColor: '#00a2ff', sThick: 0,
+            c1: '#333333', c2: '#111111', gradOn: false, gradRot: 90,
+            transparent: false, sColor: '#00a2ff', sThick: 0,
             w: 200, h: 60, x: 100, y: 100, radius: 8, z: elements.length + 1
         });
         select(id);
         save();
-    }
-
-    function calculateFitFontSize(text, width, height) {
-        // Metin uzunluğuna göre yaklaşık bir çarpan (karakter başına genişlik)
-        let charCount = text.length || 1;
-        let sizeBasedOnWidth = (width / charCount) * 1.8; // Genişliğe göre max font
-        let sizeBasedOnHeight = height * 0.75; // Yüksekliğe göre max font
-        
-        // İkisinden küçük olanı seç ki ekrandan taşmasın
-        return Math.min(sizeBasedOnWidth, sizeBasedOnHeight);
     }
 
     function render() {
@@ -172,10 +152,14 @@
             const isBtn = el.type === 'TextButton';
             div.className = `ui-element ${isBtn ? 'is-button' : ''} ${selectedId === el.id ? 'selected' : ''}`;
             
-            let bg = el.transparent ? 'transparent' : el.c1;
-            let stroke = el.sThick > 0 ? `border: ${el.sThick}px solid ${el.sColor};` : '';
-            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; background:${bg}; color:${el.tColor}; ${stroke} border-radius:${el.radius}px;`;
-            div.style.fontFamily = el.font === 'LuckiestGuy' ? 'cursive' : 'sans-serif';
+            // Background Logic (Solid or Gradient)
+            let bgStyle = el.c1;
+            if(el.gradOn) {
+                bgStyle = `linear-gradient(${el.gradRot}deg, ${el.c1} 0%, ${el.c2} 100%)`;
+            }
+            
+            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; background:${bgStyle}; color:${el.tColor}; border-radius:${el.radius}px;`;
+            if(el.sThick > 0) div.style.border = `${el.sThick}px solid ${el.sColor}`;
 
             if(el.type === 'ImageLabel' && el.icon) {
                 const img = document.createElement('img');
@@ -190,13 +174,7 @@
                 const inner = document.createElement('div');
                 inner.className = "scaled-text-inner";
                 inner.innerText = el.text;
-                
-                if(el.tScaled) {
-                    inner.style.fontSize = calculateFitFontSize(el.text, el.w, el.h) + "px";
-                } else {
-                    inner.style.fontSize = el.tSize + "px";
-                }
-                
+                inner.style.fontSize = el.tScaled ? (Math.min(el.w / el.text.length * 1.5, el.h * 0.7)) + "px" : el.tSize + "px";
                 container.appendChild(inner);
                 div.appendChild(container);
             }
@@ -226,12 +204,11 @@
             panel.style.display = 'block';
             document.getElementById('p-name').value = el.name;
             document.getElementById('p-text').value = el.text;
-            document.getElementById('p-font').value = el.font;
-            document.getElementById('p-tcolor').value = el.tColor;
-            document.getElementById('p-tsize').value = el.tSize;
             document.getElementById('p-tscaled').checked = el.tScaled;
+            document.getElementById('p-grad-on').checked = el.gradOn;
             document.getElementById('p-c1').value = el.c1;
-            document.getElementById('p-trans').checked = el.transparent;
+            document.getElementById('p-c2').value = el.c2;
+            document.getElementById('p-grad-rot').value = el.gradRot;
             document.getElementById('p-radius').value = el.radius;
             document.getElementById('p-sthick').value = el.sThick;
         } else { panel.style.display = 'none'; }
@@ -243,12 +220,11 @@
         if(!el) return;
         el.name = document.getElementById('p-name').value;
         el.text = document.getElementById('p-text').value;
-        el.font = document.getElementById('p-font').value;
-        el.tColor = document.getElementById('p-tcolor').value;
-        el.tSize = parseInt(document.getElementById('p-tsize').value) || 14;
         el.tScaled = document.getElementById('p-tscaled').checked;
+        el.gradOn = document.getElementById('p-grad-on').checked;
         el.c1 = document.getElementById('p-c1').value;
-        el.transparent = document.getElementById('p-trans').checked;
+        el.c2 = document.getElementById('p-c2').value;
+        el.gradRot = document.getElementById('p-grad-rot').value;
         el.radius = parseInt(document.getElementById('p-radius').value) || 0;
         el.sThick = parseInt(document.getElementById('p-sthick').value) || 0;
         render(); save();
@@ -274,14 +250,15 @@
     }
 
     function generateLua() {
-        let code = `-- [ v2.9 Smart Fit ] --\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)\n`;
+        let code = `-- [ v3.0 Gradient System ] --\nlocal sg = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)\n`;
         elements.forEach(el => {
             code += `\nlocal ${el.id} = Instance.new("${el.type}", sg)\n`;
             code += `${el.id}.Size = UDim2.new(0, ${Math.round(el.w)}, 0, ${Math.round(el.h)})\n`;
-            code += `${el.id}.Position = UDim2.new(0, ${Math.round(el.x)}, 0, ${Math.round(el.y)})\n`;
-            if(el.text) {
-                code += `${el.id}.Text = "${el.text}"\n`;
-                code += `${el.id}.TextScaled = ${el.tScaled}\n`;
+            code += `${el.id}.BackgroundColor3 = Color3.fromHex("${el.c1}")\n`;
+            if(el.gradOn) {
+                code += `local grad = Instance.new("UIGradient", ${el.id})\n`;
+                code += `grad.Color = ColorSequence.new(Color3.fromHex("${el.c1}"), Color3.fromHex("${el.c2}"))\n`;
+                code += `grad.Rotation = ${el.gradRot}\n`;
             }
         });
         document.getElementById('lua-code-area').innerText = code;
