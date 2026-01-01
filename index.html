@@ -2,23 +2,23 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox UI Titan v4.5 - MEGA FULL</title>
+    <title>Roblox UI Titan v4.6 - Frame Target Mode</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; --accent: #2ecc71; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
         .sidebar { width: 240px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 100; flex-shrink: 0; }
-        .properties { width: 330px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; height: 100vh; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; padding-bottom: 50px; }
+        .properties { width: 330px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; height: 100vh; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; }
         .workspace { flex-grow: 1; background-color: #111; position: relative; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
         .roblox-screen { 
             width: 1280px; height: 720px; background: #000; border: 4px solid #444; position: relative; flex-shrink: 0;
-            transform: scale(0.65); transform-origin: top center; box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            transform: scale(0.65); transform-origin: top center;
         }
 
-        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; box-sizing: border-box; text-align: center; overflow: hidden; }
+        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; box-sizing: border-box; overflow: hidden; }
         .ui-element.selected { outline: 2px solid var(--primary); outline-offset: 4px; z-index: 999 !important; }
-        .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); z-index: 20; }
+        .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); }
         
         #code-modal {
             position: fixed; right: -650px; top: 0; width: 600px; height: 100vh; background: #111; border-left: 3px solid var(--primary);
@@ -30,26 +30,26 @@
         .prop-group { background: #252525; padding: 12px; border-radius: 8px; border: 1px solid #383838; }
         .prop-group label { display: block; font-size: 0.65rem; color: #888; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; }
         input, select { width: 100%; background: #111; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
-        .btn-main:hover { filter: brightness(1.2); }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
     </style>
 </head>
 <body>
 
     <div id="code-modal">
-        <h2 style="color:var(--primary); margin:0;">📜 FULL LUA KODU</h2>
-        <div style="background:#1a2a3a; padding:10px; border-radius:6px; font-size:12px; margin: 10px 0;">REHBER: Frame içine LocalScript at ve yapıştır!</div>
+        <h2 style="color:var(--primary); margin:0;">📜 ÖZEL FRAME İÇİN KOD</h2>
+        <div style="background: #2c3e50; padding: 10px; border-radius: 6px; font-size: 13px; margin: 10px 0;">
+            <b>DİKKAT:</b> Bu kodu Studio'daki <u>hazır Frame'inin</u> içine attığın <b>LocalScript</b>'e yapıştır. Kod artık yeni frame açmaz, her şeyi o frame'in içine yerleştirir.
+        </div>
         <div id="lua-code-area"></div>
         <button onclick="copyToClipboard()" class="btn-main" style="margin-top:15px; background:var(--accent);">📋 KODU KOPYALA</button>
         <button onclick="closeConsole()" class="btn-main" style="margin-top:10px; background:#444;">KAPAT</button>
     </div>
 
     <div class="sidebar">
-        <h3 style="text-align:center; font-size:14px; color:var(--primary);">ELEMANLAR</h3>
-        <button onclick="addElement('Frame')" class="btn-main" style="background:#444;">🖼️ Frame</button>
-        <button onclick="addElement('TextButton')" class="btn-main" style="background:#444;">🔘 Button</button>
-        <button onclick="addElement('TextLabel')" class="btn-main" style="background:#444;">📄 Label</button>
-        <button onclick="addElement('ImageLabel')" class="btn-main" style="background:#444;">🖼️ Image</button>
+        <button onclick="addElement('Frame')" class="btn-main">🖼️ Alt Frame</button>
+        <button onclick="addElement('TextButton')" class="btn-main">🔘 Buton</button>
+        <button onclick="addElement('TextLabel')" class="btn-main">📄 Yazı</button>
+        <button onclick="addElement('ImageLabel')" class="btn-main">🖼️ Resim</button>
         <div id="layer-list" style="margin-top:20px;"></div>
     </div>
 
@@ -58,55 +58,26 @@
     </div>
 
     <div class="properties">
-        <h2 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-top:0;">Özellikler</h2>
         <div id="prop-inputs" style="display:none;">
             <div class="prop-group">
-                <label>Metin & İsim</label>
-                <input type="text" id="p-name" oninput="apply()" placeholder="Obje Adı">
-                <input type="text" id="p-text" oninput="apply()" placeholder="Yazı" style="margin-top:5px;">
+                <label>İsim & Metin</label>
+                <input type="text" id="p-name" oninput="apply()">
+                <input type="text" id="p-text" oninput="apply()" style="margin-top:5px;">
                 <div style="margin-top:8px; display:flex; align-items:center; gap:5px;">
                     <input type="checkbox" id="p-tscaled" onchange="apply()" style="width:16px;"> 
-                    <span style="font-size:0.75rem;">TextScaled (Smart)</span>
+                    <span>TextScaled</span>
                 </div>
             </div>
-
             <div class="prop-group">
-                <label>Font & Stil</label>
+                <label>Görünüm</label>
                 <select id="p-font" onchange="apply()">
                     <option value="LuckiestGuy">LuckiestGuy</option>
                     <option value="GothamBold">GothamBold</option>
                     <option value="Arcade">Arcade</option>
-                    <option value="SciFi">SciFi</option>
-                    <option value="Cartoon">Cartoon</option>
                 </select>
-                <div style="display:flex; gap:5px; margin-top:5px;">
-                    <input type="color" id="p-tcolor" oninput="apply()">
-                    <input type="number" id="p-tsize" oninput="apply()" placeholder="Boyut">
-                </div>
+                <input type="color" id="p-c1" oninput="apply()" style="margin-top:5px;">
+                <input type="number" id="p-radius" oninput="apply()" placeholder="Radius" style="margin-top:5px;">
             </div>
-
-            <div class="prop-group">
-                <label>Renk & Gradient</label>
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:5px;">
-                    <input type="checkbox" id="p-grad-on" onchange="apply()" style="width:16px;"> 
-                    <span style="font-size:0.75rem;">Gradient Aktif</span>
-                </div>
-                <div style="display:flex; gap:5px;">
-                    <input type="color" id="p-c1" oninput="apply()">
-                    <input type="color" id="p-c2" oninput="apply()">
-                </div>
-                <input type="range" id="p-grad-rot" min="0" max="360" oninput="apply()" style="margin-top:5px;">
-            </div>
-
-            <div class="prop-group">
-                <label>Görünüm</label>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="p-radius" oninput="apply()" placeholder="Radius">
-                    <input type="number" id="p-sthick" oninput="apply()" placeholder="Border">
-                </div>
-                <input type="text" id="p-icon" oninput="apply()" placeholder="Asset ID (Resim)" style="margin-top:5px;">
-            </div>
-
             <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; margin-bottom:8px;">👥 KOPYALA</button>
             <button onclick="generateLua()" class="btn-main" style="background:var(--accent);">📥 KODU AL (F10)</button>
             <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c; margin-top:8px;">🗑️ SİL</button>
@@ -117,39 +88,29 @@
     let elements = [];
     let selectedId = null;
 
-    function save() { localStorage.setItem('titan_mega_final', JSON.stringify(elements)); }
-    function load() { const d = localStorage.getItem('titan_mega_final'); if(d) { elements = JSON.parse(d); render(); } }
-
     function addElement(type) {
         let id = "el_" + Math.floor(Math.random()*100000);
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
             text: type.includes('Text') || type === 'TextButton' ? 'YAZI' : '',
-            icon: '6031075929', font: 'LuckiestGuy', tSize: 25, tColor: '#ffffff', tScaled: true,
-            c1: '#333333', c2: '#111111', gradOn: false, gradRot: 90,
-            radius: 8, sThick: 0, sColor: '#00a2ff',
-            w: 200, h: 60, x: 100, y: 100, z: elements.length + 1
+            font: 'LuckiestGuy', tSize: 25, tColor: '#ffffff', tScaled: true,
+            c1: '#333333', radius: 8, w: 200, h: 60, x: 100, y: 100, z: elements.length + 1
         });
-        select(id);
+        select(id); render();
     }
 
     function render() {
         const view = document.getElementById('viewport'); view.innerHTML = '';
-        elements.sort((a,b) => a.z - b.z).forEach(el => {
+        elements.forEach(el => {
             const div = document.createElement('div');
             div.className = `ui-element ${selectedId === el.id ? 'selected' : ''}`;
-            let bg = el.gradOn ? `linear-gradient(${el.gradRot}deg, ${el.c1}, ${el.c2})` : el.c1;
-            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; background:${bg}; border-radius:${el.radius}px; color:${el.tColor}; z-index:${el.z};`;
-            if(el.sThick > 0) div.style.border = `${el.sThick}px solid ${el.sColor}`;
-
-            if(el.type === 'ImageLabel') {
-                div.innerHTML = `<img src="https://www.roblox.com/asset-thumbnail/image?assetId=${el.icon}&width=420&height=420&format=png" style="width:100%; height:100%; object-fit:contain; pointer-events:none;">`;
-            } else if(el.text) {
+            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; background:${el.c1}; border-radius:${el.radius}px;`;
+            
+            if(el.text) {
                 const txt = document.createElement('div');
                 txt.innerText = el.text;
-                txt.style.width = "95%";
-                txt.style.fontFamily = (el.font === 'Arcade' ? 'monospace' : 'cursive');
                 txt.style.fontSize = el.tScaled ? (el.h * 0.5) + "px" : el.tSize + "px";
+                txt.style.color = "white";
                 div.appendChild(txt);
             }
 
@@ -160,25 +121,18 @@
             div.onclick = (e) => { e.stopPropagation(); select(el.id); };
             view.appendChild(div);
         });
-        save();
     }
 
     function select(id) {
         selectedId = id; const el = elements.find(e => e.id === id);
-        const panel = document.getElementById('prop-inputs');
         if(el) {
-            panel.style.display = 'block';
+            document.getElementById('prop-inputs').style.display = 'block';
             document.getElementById('p-name').value = el.name;
             document.getElementById('p-text').value = el.text;
-            document.getElementById('p-font').value = el.font;
-            document.getElementById('p-tsize').value = el.tSize;
             document.getElementById('p-tscaled').checked = el.tScaled;
-            document.getElementById('p-grad-on').checked = el.gradOn;
             document.getElementById('p-c1').value = el.c1;
-            document.getElementById('p-c2').value = el.c2;
             document.getElementById('p-radius').value = el.radius;
-            document.getElementById('p-icon').value = el.icon;
-        } else panel.style.display = 'none';
+        } else document.getElementById('prop-inputs').style.display = 'none';
         render();
     }
 
@@ -187,14 +141,9 @@
         el.name = document.getElementById('p-name').value;
         el.text = document.getElementById('p-text').value;
         el.font = document.getElementById('p-font').value;
-        el.tSize = parseInt(document.getElementById('p-tsize').value) || 20;
         el.tScaled = document.getElementById('p-tscaled').checked;
-        el.gradOn = document.getElementById('p-grad-on').checked;
         el.c1 = document.getElementById('p-c1').value;
-        el.c2 = document.getElementById('p-c2').value;
-        el.gradRot = document.getElementById('p-grad-rot').value;
         el.radius = parseInt(document.getElementById('p-radius').value) || 0;
-        el.icon = document.getElementById('p-icon').value;
         render();
     }
 
@@ -218,25 +167,24 @@
 
     function generateLua() {
         if(elements.length === 0) return;
+        // Tasarımı sıfırlamak için en sol üst noktayı buluyoruz
         let minX = Math.min(...elements.map(e => e.x));
         let minY = Math.min(...elements.map(e => e.y));
-        let code = `-- [[ MEGA UI v4.5 FINAL ]] --\nlocal parent = script.Parent\n`;
+
+        let code = `-- [[ v4.6 FRAME TARGET MODE ]] --\n`;
+        code += `local MainFrame = script.Parent -- Studio'da hazirladigin Frame bu!\n`;
+        
         elements.forEach(el => {
-            code += `\n-- ${el.name}\nlocal ${el.id} = Instance.new("${el.type}", parent)\n`;
+            code += `\n-- ${el.name}\nlocal ${el.id} = Instance.new("${el.type}", MainFrame)\n`;
             code += `${el.id}.Name = "${el.name}"\n`;
             code += `${el.id}.Size = UDim2.new(0, ${Math.round(el.w)}, 0, ${Math.round(el.h)})\n`;
+            // Konumu ana frame'e göre sıfırlıyoruz
             code += `${el.id}.Position = UDim2.new(0, ${Math.round(el.x - minX)}, 0, ${Math.round(el.y - minY)})\n`;
             code += `${el.id}.BackgroundColor3 = Color3.fromHex("${el.c1}")\n`;
             if(el.text) {
                 code += `${el.id}.Text = "${el.text}"\n${el.id}.Font = Enum.Font.${el.font}\n${el.id}.TextScaled = ${el.tScaled}\n`;
-                if(!el.tScaled) code += `${el.id}.TextSize = ${el.tSize}\n`;
-                code += `${el.id}.TextColor3 = Color3.new(1,1,1)\n`;
             }
-            if(el.type === 'ImageLabel') code += `${el.id}.Image = "rbxassetid://${el.icon}"\n`;
             if(el.radius > 0) code += `Instance.new("UICorner", ${el.id}).CornerRadius = UDim.new(0, ${el.radius})\n`;
-            if(el.gradOn) {
-                code += `local g = Instance.new("UIGradient", ${el.id})\ng.Color = ColorSequence.new(Color3.fromHex("${el.c1}"), Color3.fromHex("${el.c2}"))\ng.Rotation = ${el.gradRot}\n`;
-            }
         });
         document.getElementById('lua-code-area').innerText = code;
         document.getElementById('code-modal').classList.add('open');
@@ -253,7 +201,6 @@
     function closeConsole() { document.getElementById('code-modal').classList.remove('open'); }
     function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('lua-code-area').innerText).then(() => alert("Kopyalandı!")); }
     window.addEventListener('keydown', (e) => { if (e.key === 'F10') generateLua(); });
-    load();
 </script>
 </body>
 </html>
