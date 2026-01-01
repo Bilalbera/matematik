@@ -2,71 +2,50 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox UI Titan v3.2 - Frame Parent Mode</title>
+    <title>Roblox UI Titan v3.3 - Auto-Align Fixed</title>
     <style>
         :root { --primary: #00a2ff; --bg: #0d0d0d; --panel: #181818; --border: #333; --accent: #2ecc71; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
         .sidebar { width: 240px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 100; flex-shrink: 0; }
-        .properties { width: 330px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; height: 100vh; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; box-sizing: border-box; padding-bottom: 40px; }
+        .properties { width: 330px; background: var(--panel); border-left: 1px solid var(--border); padding: 15px; overflow-y: auto; height: 100vh; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; box-sizing: border-box; }
         .workspace { flex-grow: 1; background-color: #111; position: relative; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
         .roblox-screen { 
             width: 1280px; height: 720px; background: #000; border: 4px solid #444; position: relative; flex-shrink: 0;
-            transform: scale(0.65); transform-origin: top center; box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            transform: scale(0.65); transform-origin: top center;
         }
 
-        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; box-sizing: border-box; text-align: center; overflow: hidden; }
+        .ui-element { position: absolute; display: flex; align-items: center; justify-content: center; cursor: grab; overflow: hidden; }
         .ui-element.selected { outline: 2px solid var(--primary); outline-offset: 4px; z-index: 999 !important; }
-        .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); border-radius: 2px; z-index: 10; }
+        .resizer { width: 14px; height: 14px; background: white; position: absolute; right: 0; bottom: 0; cursor: nwse-resize; border: 2px solid var(--primary); }
         
-        /* MODAL & GUIDE */
         #code-modal {
             position: fixed; right: -650px; top: 0; width: 600px; height: 100vh; background: #111; border-left: 3px solid var(--primary);
-            z-index: 2000; transition: 0.3s; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column;
+            z-index: 2000; transition: 0.3s; padding: 20px; display: flex; flex-direction: column;
         }
         #code-modal.open { right: 0; }
-        .guide-box { background: #1a2a3a; border: 1px solid var(--primary); padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 10px; color: #fff; }
         #lua-code-area { flex-grow: 1; background: #050505; color: #dcdcaa; padding: 15px; border-radius: 8px; font-family: 'Consolas', monospace; font-size: 12px; overflow: auto; white-space: pre; border: 1px solid #333; }
-
+        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
         .prop-group { background: #252525; padding: 12px; border-radius: 8px; border: 1px solid #383838; }
-        .prop-group label { display: block; font-size: 0.65rem; color: #888; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; }
-        input, select { width: 100%; background: #111; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; width: 100%; }
-        
-        .is-button { transition: transform 0.1s, filter 0.1s; cursor: pointer; }
-        .is-button:hover { filter: brightness(1.2); }
-        .is-button:active { transform: scale(0.92) !important; }
-
-        #test-exit { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; background: #e74c3c; padding: 15px 40px; border-radius: 50px; border: none; color: white; font-weight: bold; cursor: pointer; }
+        input, select { width: 100%; background: #111; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <button id="test-exit" onclick="toggleTestMode(false)">⏹ TEST MODUNDAN ÇIK</button>
-
     <div id="code-modal">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:10px;">
-            <h2 style="margin:0; color:var(--primary);">📜 LUA KODU & REHBER</h2>
-            <button onclick="closeConsole()" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">&times;</button>
-        </div>
-        <div class="guide-box">
-            <b>NASIL KULLANILIR?</b><br>
-            1. Roblox Studio'da kendi <b>Frame</b>'ini oluştur.<br>
-            2. Frame'in içine bir <b>LocalScript</b> ekle.<br>
-            3. Aşağıdaki kodu kopyalayıp o scriptin içine yapıştır.<br>
-            <i>* Kod her şeyi bu Frame'in içinde yaratacaktır.</i>
-        </div>
+        <h2 style="color:var(--primary);">🚀 HİZALANMIŞ LUA KODU</h2>
+        <p style="font-size: 12px; color: #aaa;">Not: İlk oluşturduğun element ana gövde olarak (0,0) konumuna çekilir, diğerleri ona göre dizilir.</p>
         <div id="lua-code-area"></div>
         <button onclick="copyToClipboard()" class="btn-main" style="margin-top:15px; background:var(--accent);">📋 KODU KOPYALA</button>
+        <button onclick="closeConsole()" class="btn-main" style="margin-top:10px; background:#444;">KAPAT</button>
     </div>
 
     <div class="sidebar">
-        <button onclick="toggleTestMode(true)" style="background:#f1c40f; color:black; margin-bottom:10px;" class="btn-main">▶ TEST MODU</button>
-        <button onclick="addElement('Frame')" class="btn-main" style="background:#333;">🖼️ Frame</button>
-        <button onclick="addElement('TextButton')" class="btn-main" style="background:#333;">🔘 Button</button>
-        <button onclick="addElement('TextLabel')" class="btn-main" style="background:#333;">📄 Label</button>
-        <button onclick="addElement('ImageLabel')" class="btn-main" style="background:#333;">🖼️ Image</button>
+        <button onclick="addElement('Frame')" class="btn-main">🖼️ Frame</button>
+        <button onclick="addElement('TextButton')" class="btn-main">🔘 Button</button>
+        <button onclick="addElement('TextLabel')" class="btn-main">📄 Label</button>
+        <button onclick="addElement('ImageLabel')" class="btn-main">🖼️ Image</button>
         <div id="layer-list" style="margin-top:20px;"></div>
     </div>
 
@@ -75,172 +54,84 @@
     </div>
 
     <div class="properties">
-        <h2 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Özellikler</h2>
-        <div id="prop-inputs" style="display:none;">
+        <div id="prop-inputs" style="display:none; padding:15px;">
             <div class="prop-group">
                 <label>İsim & Metin</label>
-                <input type="text" id="p-name" oninput="apply()" style="margin-bottom:8px;">
+                <input type="text" id="p-name" oninput="apply()">
                 <input type="text" id="p-text" oninput="apply()">
-                <div style="margin-top:8px; display:flex; align-items:center; gap:5px;">
-                    <input type="checkbox" id="p-tscaled" onchange="apply()" style="width:16px;"> 
-                    <span style="font-size:0.75rem; color:var(--primary);">TextScaled (Smart)</span>
-                </div>
             </div>
-
-            <div class="prop-group">
-                <label>Yazı Fontu</label>
+            <div class="prop-group" style="margin-top:10px;">
+                <label>Renk & Gradient</label>
+                <div style="display:flex; gap:5px;"><input type="color" id="p-c1" oninput="apply()"><input type="color" id="p-c2" oninput="apply()"></div>
+                <div style="display:flex; align-items:center; gap:5px; margin-top:5px;"><input type="checkbox" id="p-grad-on" onchange="apply()"><span>Gradient</span></div>
+            </div>
+            <div class="prop-group" style="margin-top:10px;">
+                <label>Font & Scaled</label>
                 <select id="p-font" onchange="apply()">
-                    <option value="Arial">Arial</option>
                     <option value="GothamBold">GothamBold</option>
                     <option value="LuckiestGuy">LuckiestGuy</option>
                     <option value="Arcade">Arcade</option>
-                    <option value="SciFi">SciFi</option>
-                    <option value="Cartoon">Cartoon</option>
                 </select>
-                <div style="margin-top:8px; display:flex; gap:8px;">
-                    <input type="color" id="p-tcolor" oninput="apply()">
-                    <input type="number" id="p-tsize" oninput="apply()">
-                </div>
+                <div style="display:flex; align-items:center; gap:5px; margin-top:5px;"><input type="checkbox" id="p-tscaled" onchange="apply()"><span>TextScaled</span></div>
             </div>
-
-            <div class="prop-group">
-                <label>Gradient (Renk Geçişi)</label>
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:8px;">
-                    <input type="checkbox" id="p-grad-on" onchange="apply()" style="width:16px;"> 
-                    <span style="font-size:0.75rem;">Gradient Aktif</span>
-                </div>
-                <div style="display:flex; gap:8px;">
-                    <input type="color" id="p-c1" oninput="apply()">
-                    <input type="color" id="p-c2" oninput="apply()">
-                </div>
-                <input type="range" id="p-grad-rot" min="0" max="360" value="90" oninput="apply()" style="margin-top:8px;">
-            </div>
-
-            <div class="prop-group">
-                <label>Görünüm</label>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                    <div><label>Radius</label><input type="number" id="p-radius" oninput="apply()"></div>
-                    <div><label>Stroke</label><input type="number" id="p-sthick" oninput="apply()"></div>
-                </div>
-                <label style="margin-top:8px;">Image Asset ID</label>
-                <input type="text" id="p-icon" oninput="apply()">
-            </div>
-
-            <button onclick="duplicateElement()" class="btn-main" style="background:#8e44ad; margin-bottom:8px;">👥 KOPYALA</button>
-            <button onclick="generateLua()" class="btn-main" style="background:var(--accent);">📥 LUA KODU (F10)</button>
-            <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c; margin-top:8px;">🗑️ SİL</button>
+            <button onclick="generateLua()" class="btn-main" style="margin-top:15px; background:var(--accent);">📥 KODU AL (F10)</button>
+            <button onclick="deleteSelected()" class="btn-main" style="background:#e74c3c; margin-top:8px;">SİL</button>
         </div>
     </div>
 
 <script>
     let elements = [];
     let selectedId = null;
-    let isTestMode = false;
 
-    window.addEventListener('keydown', (e) => { if (e.key === 'F10') { e.preventDefault(); generateLua(); } });
-
-    function save() { localStorage.setItem('titan_ui_v32', JSON.stringify(elements)); }
-    function load() { 
-        const d = localStorage.getItem('titan_ui_v32');
-        if(d) { elements = JSON.parse(d); render(); }
-    }
+    function save() { localStorage.setItem('titan_ui_v33', JSON.stringify(elements)); }
+    function load() { const d = localStorage.getItem('titan_ui_v33'); if(d) { elements = JSON.parse(d); render(); } }
 
     function addElement(type) {
         let id = "el_" + Math.floor(Math.random()*100000);
         elements.push({
             id: id, type: type, name: type + "_" + elements.length,
-            text: type.includes('Text') ? 'Yazı' : '',
-            icon: type === 'ImageLabel' ? '6031075929' : '',
-            font: 'GothamBold', tSize: 18, tColor: '#ffffff', tScaled: true,
+            text: type.includes('Text') ? 'Metin' : '', icon: '6031075929',
+            font: 'GothamBold', tColor: '#ffffff', tScaled: true,
             c1: '#333333', c2: '#111111', gradOn: false, gradRot: 90,
-            radius: 8, sThick: 0, sColor: '#00a2ff',
-            w: 200, h: 60, x: 100, y: 100, z: elements.length + 1
+            radius: 8, w: 200, h: 60, x: 100, y: 100, z: elements.length + 1
         });
-        select(id); render(); save();
+        select(id); save();
     }
 
     function render() {
-        const view = document.getElementById('viewport');
-        view.innerHTML = '';
-        const list = document.getElementById('layer-list');
-        list.innerHTML = '';
-
+        const view = document.getElementById('viewport'); view.innerHTML = '';
         elements.sort((a,b) => a.z - b.z).forEach(el => {
             const div = document.createElement('div');
-            const isBtn = el.type === 'TextButton';
-            div.className = `ui-element ${isBtn ? 'is-button' : ''} ${selectedId === el.id ? 'selected' : ''}`;
-            
-            let bg = el.gradOn ? `linear-gradient(${el.gradRot}deg, ${el.c1} 0%, ${el.c2} 100%)` : el.c1;
-            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; z-index:${el.z}; background:${bg}; color:${el.tColor}; border-radius:${el.radius}px;`;
-            if(el.sThick > 0) div.style.border = `${el.sThick}px solid ${el.sColor}`;
-
-            const fontMap = { 'LuckiestGuy': 'cursive', 'Arcade': 'monospace', 'SciFi': 'fantasy' };
-            div.style.fontFamily = fontMap[el.font] || 'sans-serif';
-
-            if(el.type === 'ImageLabel' && el.icon) {
-                const img = document.createElement('img');
-                img.style = "width:100%; height:100%; object-fit:contain; pointer-events:none;";
-                img.src = `https://www.roblox.com/asset-thumbnail/image?assetId=${el.icon}&width=420&height=420&format=png`;
-                div.appendChild(img);
-            }
-
-            if(el.text) {
-                const inner = document.createElement('div');
-                inner.innerText = el.text;
-                inner.style.fontSize = el.tScaled ? (Math.min(el.w / (el.text.length * 0.6), el.h * 0.7)) + "px" : el.tSize + "px";
-                div.appendChild(inner);
-            }
-            
-            if(!isTestMode) {
-                const r = document.createElement('div'); r.className = 'resizer';
-                r.onmousedown = (e) => startResize(e, el);
-                div.appendChild(r);
-                div.onmousedown = (e) => { e.stopPropagation(); startDrag(e, el); };
-                div.onclick = (e) => { e.stopPropagation(); select(el.id); };
-            }
+            div.className = `ui-element ${selectedId === el.id ? 'selected' : ''}`;
+            let bg = el.gradOn ? `linear-gradient(${el.gradRot}deg, ${el.c1}, ${el.c2})` : el.c1;
+            div.style = `left:${el.x}px; top:${el.y}px; width:${el.w}px; height:${el.h}px; background:${bg}; border-radius:${el.radius}px;`;
+            if(el.text) div.innerHTML = `<span style="font-size:${el.tScaled ? '20px' : '14px'}">${el.text}</span>`;
+            div.onmousedown = (e) => { e.stopPropagation(); startDrag(e, el); };
+            div.onclick = (e) => { e.stopPropagation(); select(el.id); };
             view.appendChild(div);
-
-            const li = document.createElement('div');
-            li.style = `background:#222; padding:8px; margin-bottom:4px; border-radius:4px; font-size:11px; cursor:pointer; border-left: 3px solid ${selectedId === el.id ? 'var(--primary)' : 'transparent'}`;
-            li.innerText = el.name;
-            li.onclick = () => select(el.id);
-            list.appendChild(li);
         });
     }
 
     function select(id) {
-        selectedId = id;
-        const el = elements.find(e => e.id === id);
-        const panel = document.getElementById('prop-inputs');
+        selectedId = id; const el = elements.find(e => e.id === id);
         if(el) {
-            panel.style.display = 'block';
+            document.getElementById('prop-inputs').style.display = 'block';
             document.getElementById('p-name').value = el.name;
             document.getElementById('p-text').value = el.text;
-            document.getElementById('p-font').value = el.font;
-            document.getElementById('p-tscaled').checked = el.tScaled;
             document.getElementById('p-grad-on').checked = el.gradOn;
-            document.getElementById('p-c1').value = el.c1;
-            document.getElementById('p-c2').value = el.c2;
-            document.getElementById('p-radius').value = el.radius;
-            document.getElementById('p-sthick').value = el.sThick;
-            document.getElementById('p-icon').value = el.icon || '';
-        } else { panel.style.display = 'none'; }
+            document.getElementById('p-tscaled').checked = el.tScaled;
+        } else document.getElementById('prop-inputs').style.display = 'none';
         render();
     }
 
     function apply() {
-        const el = elements.find(e => e.id === selectedId);
-        if(!el) return;
+        const el = elements.find(e => e.id === selectedId); if(!el) return;
         el.name = document.getElementById('p-name').value;
         el.text = document.getElementById('p-text').value;
-        el.font = document.getElementById('p-font').value;
-        el.tScaled = document.getElementById('p-tscaled').checked;
         el.gradOn = document.getElementById('p-grad-on').checked;
         el.c1 = document.getElementById('p-c1').value;
         el.c2 = document.getElementById('p-c2').value;
-        el.radius = parseInt(document.getElementById('p-radius').value) || 0;
-        el.sThick = parseInt(document.getElementById('p-sthick').value) || 0;
-        el.icon = document.getElementById('p-icon').value;
+        el.tScaled = document.getElementById('p-tscaled').checked;
         render(); save();
     }
 
@@ -251,52 +142,32 @@
         document.addEventListener('mousemove', move); document.addEventListener('mouseup', stop);
     }
 
-    function startResize(e, el) {
-        e.stopPropagation();
-        const move = (ev) => {
-            const rect = document.getElementById('viewport').getBoundingClientRect();
-            el.w = (ev.clientX - rect.left) / 0.65 - el.x;
-            el.h = (ev.clientY - rect.top) / 0.65 - el.y;
-            render(); save();
-        };
-        const stop = () => document.removeEventListener('mousemove', move);
-        document.addEventListener('mousemove', move); document.addEventListener('mouseup', stop);
-    }
-
     function generateLua() {
-        let code = `-- [ Roblox UI Titan v3.2 - Frame Mode ] --\n-- REHBER: Bu kodu bir Frame icindeki LocalScript'e yapistirin!\n\nlocal parent = script.Parent\n`;
+        if (elements.length === 0) return;
+        // En sol üstteki elementi bul ve onu referans al
+        let minX = Math.min(...elements.map(e => e.x));
+        let minY = Math.min(...elements.map(e => e.y));
+
+        let code = `-- [ v3.3 Auto-Align ] --\nlocal parent = script.Parent\n`;
         elements.forEach(el => {
-            code += `\n-- [[ ${el.name} ]]\nlocal ${el.id} = Instance.new("${el.type}", parent)\n`;
-            code += `${el.id}.Name = "${el.name}"\n`;
-            code += `${el.id}.Size = UDim2.new(0, ${Math.round(el.w)}, 0, ${Math.round(el.h)})\n`;
-            code += `${el.id}.Position = UDim2.new(0, ${Math.round(el.x)}, 0, ${Math.round(el.y)})\n`;
+            let relX = Math.round(el.x - minX);
+            let relY = Math.round(el.y - minY);
+            code += `\nlocal ${el.id} = Instance.new("${el.type}", parent)\n`;
+            code += `${el.id}.Position = UDim2.new(0, ${relX}, 0, ${relY})\n`;
+            code += `${el.id}.Size = UDim2.new(0, ${el.w}, 0, ${el.h})\n`;
             if(el.gradOn) {
-                code += `local g = Instance.new("UIGradient", ${el.id})\ng.Color = ColorSequence.new(Color3.fromHex("${el.c1}"), Color3.fromHex("${el.c2}"))\ng.Rotation = ${el.gradRot}\n`;
-            } else {
-                code += `${el.id}.BackgroundColor3 = Color3.fromHex("${el.c1}")\n`;
-            }
-            if(el.text) {
-                code += `${el.id}.Text = "${el.text}"\n${el.id}.Font = Enum.Font.${el.font}\n${el.id}.TextScaled = ${el.tScaled}\n`;
-            }
+                code += `local g = Instance.new("UIGradient", ${el.id})\ng.Color = ColorSequence.new(Color3.fromHex("${el.c1}"), Color3.fromHex("${el.c2}"))\n`;
+            } else { code += `${el.id}.BackgroundColor3 = Color3.fromHex("${el.c1}")\n`; }
+            if(el.text) code += `${el.id}.Text = "${el.text}"\n${el.id}.TextScaled = ${el.tScaled}\n`;
             if(el.radius > 0) code += `Instance.new("UICorner", ${el.id}).CornerRadius = UDim.new(0, ${el.radius})\n`;
-            if(el.type === 'ImageLabel') code += `${el.id}.Image = "rbxassetid://${el.icon}"\n`;
         });
         document.getElementById('lua-code-area').innerText = code;
         document.getElementById('code-modal').classList.add('open');
     }
 
-    function toggleTestMode(v) { isTestMode = v; select(null); document.getElementById('test-exit').style.display = v ? 'block' : 'none'; render(); }
     function closeConsole() { document.getElementById('code-modal').classList.remove('open'); }
-    function deleteSelected() { elements = elements.filter(e => e.id !== selectedId); select(null); render(); save(); }
-    function duplicateElement() { 
-        const original = elements.find(e => e.id === selectedId);
-        if(!original) return;
-        const copy = JSON.parse(JSON.stringify(original));
-        copy.id = "el_" + Math.floor(Math.random()*100000);
-        copy.x += 20; copy.y += 20; elements.push(copy); select(copy.id); save();
-    }
-    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('lua-code-area').innerText).then(() => alert("Kopyalandı! Frame içindeki LocalScript'e yapıştırın.")); }
-
+    function deleteSelected() { elements = elements.filter(e => e.id !== selectedId); select(null); save(); }
+    window.addEventListener('keydown', (e) => { if (e.key === 'F10') generateLua(); });
     load();
 </script>
 </body>
