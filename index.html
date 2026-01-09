@@ -1,174 +1,173 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6. Sınıf 2026 Bilgi Yarışması</title>
+    <title>6th Grade English Quiz 2026</title>
     <style>
         :root {
-            --primary: #4a90e2;
-            --success: #2ecc71;
-            --danger: #e74c3c;
-            --dark: #2c3e50;
+            --primary: #6c5ce7;
+            --success: #00b894;
+            --danger: #d63031;
+            --bg: #dfe6e9;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
         }
-        #quiz-container {
+        #quiz-card {
             background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             width: 90%;
-            max-width: 600px;
-            text-align: center;
+            max-width: 500px;
         }
-        .header {
+        .stats {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
             font-weight: bold;
-            color: var(--dark);
+            color: #636e72;
         }
-        .question {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--dark);
+        #question-text {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: #2d3436;
+            min-height: 60px;
         }
-        .options {
+        .options-grid {
             display: grid;
-            gap: 10px;
+            gap: 12px;
         }
-        button {
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
+        button.opt {
+            padding: 15px;
+            border: 2px solid #edeff2;
+            border-radius: 12px;
+            background: #f9f9f9;
             cursor: pointer;
-            transition: all 0.2s;
             font-size: 1rem;
+            text-align: left;
+            transition: all 0.3s ease;
         }
-        button:hover {
-            background-color: #f0f0f0;
+        button.opt:hover {
+            background: #eef2ff;
             border-color: var(--primary);
         }
-        .correct {
-            background-color: var(--success) !important;
+        .correct { background-color: var(--success) !important; color: white; border-color: var(--success) !important; }
+        .wrong { background-color: var(--danger) !important; color: white; border-color: var(--danger) !important; }
+        #final-screen { display: none; text-align: center; }
+        .score-display { font-size: 3rem; color: var(--primary); margin: 20px 0; }
+        .restart-btn {
+            background: var(--primary);
             color: white;
-            border-color: var(--success);
-        }
-        .wrong {
-            background-color: var(--danger) !important;
-            color: white;
-            border-color: var(--danger);
-        }
-        #result {
-            display: none;
-        }
-        .score-box {
-            font-size: 2rem;
-            color: var(--primary);
-            margin: 20px 0;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
 
-<div id="quiz-container">
-    <div id="game-zone">
-        <div class="header">
-            <span>Soru: <span id="q-num">1</span>/10</span>
-            <span>Puan: <span id="score">0</span></span>
+<div id="quiz-card">
+    <div id="game-ui">
+        <div class="stats">
+            <span>Question: <span id="q-count">1</span>/10</span>
+            <span>Score: <span id="current-score">0</span></span>
         </div>
-        <div class="question" id="question-text">Soru yükleniyor...</div>
-        <div class="options" id="options-container">
-            </div>
+        <div id="question-text">Loading question...</div>
+        <div class="options-grid" id="options"></div>
     </div>
 
-    <div id="result">
-        <h1>Sınav Tamamlandı!</h1>
-        <div class="score-box">Toplam Puanın: <span id="final-score">0</span> / 100</div>
-        <button onclick="location.reload()">Tekrar Dene</button>
+    <div id="final-screen">
+        <h2>Quiz Completed!</h2>
+        <div class="score-display"><span id="total-score">0</span> / 100</div>
+        <p id="feedback-msg"></p>
+        <button class="restart-btn" onclick="location.reload()">Try Again</button>
     </div>
 </div>
 
 <script>
-    const questions = [
-        { q: "Güneş sistemindeki en büyük gezegen hangisidir?", a: "Jüpiter", options: ["Mars", "Satürn", "Jüpiter", "Venüs"] },
-        { q: "Hangi kelime türemiş bir sözcüktür?", a: "Gözlük", options: ["Elma", "Gözlük", "Kedi", "Masa"] },
-        { q: "Bir açının bütünleri 110 derece ise bu açı kaç derecedir?", a: "70", options: ["80", "70", "90", "100"] },
-        { q: "Kandaki oksijeni taşıyan hücre hangisidir?", a: "Alyuvar", options: ["Akyuvar", "Kan pulcukları", "Alyuvar", "Plazma"] },
-        { q: "İslamiyet öncesi Türk devletlerinde devlet işlerinin görüşüldüğü meclise ne denir?", a: "Kurultay", options: ["Divan", "Kurultay", "Toy", "Meclis"] },
-        { q: "Hangi sayı hem 2'ye hem 3'e tam bölünür?", a: "12", options: ["10", "12", "15", "8"] },
-        { q: "Sıvıların hacmi ne ile ölçülür?", a: "Dereceli silindir", options: ["Terazi", "Dereceli silindir", "Metre", "Dinamometre"] },
-        { q: "İlk Türk İslam devletlerinde kervansaraylar ne amaçla yapılmıştır?", a: "Ticaret", options: ["Eğitim", "Savunma", "Ticaret", "Tarım"] },
-        { q: "Hücrenin yönetim merkezi neresidir?", a: "Çekirdek", options: ["Sitoplazma", "Çekirdek", "Mitokondri", "Koful"] },
-        { q: "Aşağıdakilerden hangisi bir edat (ilgeç) tır?", a: "Gibi", options: ["Ve", "Ama", "Gibi", "Çünkü"] }
+    const englishQuestions = [
+        { q: "I love eating ____ and honey at breakfast. It is my favorite!", a: "butter", opts: ["olives", "butter", "salami", "cereal"] },
+        { q: "A: Can I have some more orange juice? <br> B: Sorry, ____. It's all gone.", a: "it's all finished", opts: ["enjoy it", "sure", "it's all finished", "yes, please"] },
+        { q: "My father is ____ the car in the garden right now.", a: "washing", opts: ["wash", "washes", "washing", "washed"] },
+        { q: "Downtown is ____ than the village. There are many cars.", a: "noisier", opts: ["noisier", "quiet", "more quiet", "noisy"] },
+        { q: "How do you feel in rainy weather?", a: "I feel moody", opts: ["It is hot", "I feel moody", "I like sun", "No, I don't"] },
+        { q: "What time is it? (08:30)", a: "It is half past eight", opts: ["It is quarter past eight", "It is eight o'clock", "It is half past eight", "It is ten to eight"] },
+        { q: "Which one is a 'healthy' food?", a: "Cucumber", opts: ["Chips", "Cucumber", "Donut", "Muffin"] },
+        { q: "A: ____ does he go to the gym? <br> B: Twice a week.", a: "How often", opts: ["Where", "What time", "When", "How often"] },
+        { q: "The weather is ____ in Erzurum in winter. It's -10 degrees.", a: "freezing", opts: ["freezing", "hot", "sunny", "windy"] },
+        { q: "She ____ her teeth every morning.", a: "brushes", opts: ["brush", "brushing", "brushes", "is brushing"] }
     ];
 
-    let currentQuestionIndex = 0;
-    let totalScore = 0;
-    const maxScore = 100;
+    let currentIndex = 0;
+    let score = 0;
 
-    function loadQuestion() {
-        const q = questions[currentQuestionIndex];
-        document.getElementById("q-num").innerText = currentQuestionIndex + 1;
-        document.getElementById("question-text").innerText = q.q;
-        const container = document.getElementById("options-container");
-        container.innerHTML = "";
+    function startQuiz() {
+        const q = englishQuestions[currentIndex];
+        document.getElementById("q-count").innerText = currentIndex + 1;
+        document.getElementById("question-text").innerHTML = q.q;
+        const optContainer = document.getElementById("options");
+        optContainer.innerHTML = "";
 
-        q.options.forEach((opt, index) => {
+        q.opts.forEach((o, i) => {
             const btn = document.createElement("button");
-            btn.innerText = String.fromCharCode(65 + index) + ") " + opt;
-            btn.onclick = () => checkAnswer(opt, btn);
-            container.appendChild(btn);
+            btn.classList.add("opt");
+            btn.innerHTML = `<b>${String.fromCharCode(65+i)})</b> ${o}`;
+            btn.onclick = () => check(o, btn);
+            optContainer.appendChild(btn);
         });
     }
 
-    function checkAnswer(selected, btn) {
-        const correct = questions[currentQuestionIndex].a;
-        const buttons = document.querySelectorAll("#options-container button");
-        
-        buttons.forEach(b => b.disabled = true);
+    function check(choice, btn) {
+        const correct = englishQuestions[currentIndex].a;
+        const allBtns = document.querySelectorAll(".opt");
+        allBtns.forEach(b => b.disabled = true);
 
-        if (selected === correct) {
+        if(choice === correct) {
             btn.classList.add("correct");
-            // Rastgele puan ekle (Her soru yaklasik 10 puan ama rastgelelik olsun dendiği için)
-            let randomPoints = Math.floor(Math.random() * 5) + 8; // 8-12 arası puan
-            totalScore += randomPoints;
-            if(totalScore > 100) totalScore = 100; // Maksimum 100 sınırı
+            // Rastgele puan: 9-11 arası vererek 100'e yaklaştırıyoruz
+            let randomStep = Math.floor(Math.random() * 3) + 9; 
+            score += randomStep;
+            if(currentIndex === 9 && score < 100 && score > 85) score = 100; // Son soruda 100'e tamamla
         } else {
             btn.classList.add("wrong");
-            buttons.forEach(b => {
+            allBtns.forEach(b => {
                 if(b.innerText.includes(correct)) b.classList.add("correct");
             });
         }
 
-        document.getElementById("score").innerText = totalScore;
+        document.getElementById("current-score").innerText = score;
 
         setTimeout(() => {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                loadQuestion();
+            currentIndex++;
+            if(currentIndex < englishQuestions.length) {
+                startQuiz();
             } else {
-                showResult();
+                finish();
             }
         }, 1500);
     }
 
-    function showResult() {
-        document.getElementById("game-zone").style.display = "none";
-        document.getElementById("result").style.display = "block";
-        document.getElementById("final-score").innerText = totalScore;
+    function finish() {
+        document.getElementById("game-ui").style.display = "none";
+        document.getElementById("final-screen").style.display = "block";
+        if(score > 100) score = 100;
+        document.getElementById("total-score").innerText = score;
+        
+        let msg = score >= 70 ? "Great Job! 🌟" : "Keep Practicing! 📚";
+        document.getElementById("feedback-msg").innerText = msg;
     }
 
-    loadQuestion();
+    startQuiz();
 </script>
 
 </body>
