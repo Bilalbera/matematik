@@ -332,38 +332,6 @@
             box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
         }
 
-        /* Result Screen Buttons */
-        .result-buttons-container {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .result-button {
-            flex: 1;
-            min-width: 150px;
-            background: linear-gradient(45deg, #4facfe, #00f2fe);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 15px;
-            color: white;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
-        }
-
-        .result-button:active { transform: scale(0.95); }
-        .result-button:hover { box-shadow: 0 8px 25px rgba(0, 242, 254, 0.6); }
-
-        .result-button-alt {
-            background: linear-gradient(45deg, #11998e, #38ef7d);
-            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
-        }
-
         @media (max-width: 600px) {
             h1 { font-size: 1.8rem; }
             .glass-panel { padding: 15px; width: 98%; }
@@ -375,8 +343,6 @@
             .player-zones { gap: 10px; }
             .mode-buttons-container { flex-direction: column; }
             .mode-btn { min-width: 100%; }
-            .result-buttons-container { flex-direction: column; }
-            .result-button { min-width: 100%; }
         }
     </style>
 </head>
@@ -447,10 +413,7 @@
         <h1>Süre Doldu!</h1>
         <h2 id="final-result-text" style="font-size: 2.5rem; margin: 15px 0;">Skor</h2>
         <p id="winner-text" style="font-size: 1.2rem; margin-bottom: 25px; color: #ddd;"></p>
-        <div class="result-buttons-container">
-            <button class="result-button result-button-alt" id="retry-button">Tekrar Oyna</button>
-            <button class="result-button" onclick="showModeSelection()">Mod Seçimi</button>
-        </div>
+        <button class="btn mode-btn-alt" onclick="showModeSelection()">Mod Seçimi</button>
     </div>
 
     <script>
@@ -809,13 +772,10 @@
 
             let finalResultText = document.getElementById('final-result-text');
             let winnerText = document.getElementById('winner-text');
-            let retryButton = document.getElementById('retry-button');
 
             if (currentMode === 'single') {
                 finalResultText.innerText = `${p1Score} Puan`;
                 winnerText.innerText = "Harika antrenmandı!";
-                retryButton.innerText = "Tekrar Oyna";
-                retryButton.onclick = function() { startGame('single'); };
             } else {
                 finalResultText.innerText = `${p1Score} - ${p2Score}`;
                 if (p1Score > p2Score) {
@@ -828,8 +788,6 @@
                     winnerText.innerText = "🤝 Berabere!";
                     winnerText.style.color = "#fff";
                 }
-                retryButton.innerText = "Tekrar Oyna";
-                retryButton.onclick = function() { startGame('1v1'); };
             }
         }
     </script>
