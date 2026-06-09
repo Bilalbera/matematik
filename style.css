@@ -1,60 +1,21 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matematik Yarışı</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-</head>
-<body>
+:root { --primary: #6366f1; --bg: #0f172a; --text: #f8fafc; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
 
-    <div id="loading-screen">
-        <div class="loader"></div>
-        <h1 class="loading-title">Yükleniyor...</h1>
-        <div class="credit">Bilal Bera Cantekin tarafından yapıldı</div>
-    </div>
+body { background: var(--bg); color: var(--text); height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
-    <div id="main-menu" class="screen hidden">
-        <h1 class="title">Oyunlar</h1>
-        <div class="menu-buttons">
-            <button class="btn primary-btn" onclick="showModeSelection()">Matematik Yarışı Oyna</button>
-        </div>
-    </div>
+.screen { display: none; text-align: center; flex-direction: column; gap: 20px; }
+.active { display: flex; }
 
-    <div id="mode-selection" class="screen hidden">
-        <h2 class="title">Oyun Modu</h2>
-        <div class="menu-buttons">
-            <button class="btn action-btn" onclick="startGame('single')">Tek Oyunculu</button>
-            <button class="btn action-btn" onclick="startGame('1v1')">İki Kişi (1v1)</button>
-            <button class="btn back-btn" onclick="showMainMenu()">Geri</button>
-        </div>
-    </div>
+#loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+.spinner { width: 50px; height: 50px; border: 5px solid #334155; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
 
-    <div id="game-screen" class="screen hidden">
-        <div id="timer-box">Süre: <span id="time-left">100</span>s</div>
-        
-        <div id="players-container">
-            <div id="player1-area" class="player-card">
-                <div class="score-box">Oyuncu 1: <span id="score1">0</span></div>
-                <div class="question" id="q1">? x ?</div>
-                <div class="options" id="options1"></div>
-            </div>
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-            <div id="player2-area" class="player-card hidden">
-                <div class="score-box">Oyuncu 2: <span id="score2">0</span></div>
-                <div class="question" id="q2">? x ?</div>
-                <div class="options" id="options2"></div>
-            </div>
-        </div>
-    </div>
+button { padding: 15px 30px; font-size: 1.2rem; cursor: pointer; background: var(--primary); color: white; border: none; border-radius: 8px; transition: 0.3s; }
+button:hover { opacity: 0.9; transform: scale(1.05); }
 
-    <div id="result-screen" class="screen hidden">
-        <h2 class="title">Süre Bitti!</h2>
-        <div id="final-result" class="result-text"></div>
-        <button class="btn primary-btn" onclick="showMainMenu()">Ana Menüye Dön</button>
-    </div>
+#timer { font-size: 3rem; font-weight: bold; transition: color 0.3s; }
+.danger { color: #ef4444; }
 
-    <script src="script.js"></script>
-</body>
-</html>
+#game-container { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+.player-zone { font-size: 1.5rem; padding: 20px; border: 2px solid #334155; border-radius: 10px; width: 80%; }
