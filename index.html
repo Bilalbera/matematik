@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mega Portal | Matematik Yarışı</title>
+    <title>Mega Portal | Oyun Seçimi</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -11,10 +11,11 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             color: #fff;
@@ -34,8 +35,8 @@
         /* Glassmorphism Panel */
         .glass-panel {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -47,10 +48,10 @@
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            background: -webkit-linear-gradient(#00d2ff, #3a7bd5);
+            background: -webkit-linear-gradient(#f12711, #f5af19);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -58,38 +59,40 @@
         .btn {
             background: linear-gradient(45deg, #11998e, #38ef7d);
             border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
+            padding: 15px 20px;
+            border-radius: 15px;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            margin: 10px;
+            margin: 10px 0;
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
             width: 100%;
-            max-width: 300px;
         }
 
-        .btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(56, 239, 125, 0.6);
-        }
+        .btn:active { transform: scale(0.95); }
+        .btn:hover { box-shadow: 0 8px 25px rgba(56, 239, 125, 0.6); }
 
         .btn-alt {
-            background: linear-gradient(45deg, #ff9966, #ff5e62);
-            box-shadow: 0 4px 15px rgba(255, 94, 98, 0.4);
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
         }
-
-        .btn-alt:hover {
-            box-shadow: 0 8px 25px rgba(255, 94, 98, 0.6);
+        
+        .btn-locked {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            box-shadow: none;
+            cursor: not-allowed;
+            border: 1px dashed rgba(255,255,255,0.3);
         }
+        .btn-locked:hover { box-shadow: none; transform: none; }
 
         /* Loading Screen */
         #loading-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f2027;
+            background: #1f1c2c;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -100,7 +103,7 @@
 
         .loader {
             border: 5px solid rgba(255,255,255,0.1);
-            border-top: 5px solid #00d2ff;
+            border-top: 5px solid #f5af19;
             border-radius: 50%;
             width: 60px; height: 60px;
             animation: spin 1s linear infinite;
@@ -109,7 +112,7 @@
 
         .creator-text {
             font-size: 1rem;
-            color: #aaa;
+            color: #ccc;
             letter-spacing: 2px;
             animation: pulse 2s infinite;
         }
@@ -125,7 +128,7 @@
             justify-content: space-between;
             font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 1px solid rgba(255,255,255,0.2);
             padding-bottom: 10px;
         }
@@ -133,53 +136,56 @@
         .question-box {
             font-size: 4rem;
             font-weight: 800;
-            margin: 20px 0;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            margin: 15px 0;
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
         }
 
-        .input-group {
+        /* Options Grid */
+        .options-container {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
         }
 
-        input[type="number"] {
-            width: 100%;
-            max-width: 250px;
-            padding: 15px;
+        .option-btn {
+            flex: 1;
+            padding: 15px 5px;
             font-size: 1.5rem;
-            text-align: center;
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.3);
-            background: rgba(0,0,0,0.2);
+            font-weight: bold;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             color: white;
-            outline: none;
-            transition: border 0.3s;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        input[type="number"]:focus {
-            border-color: #00d2ff;
+        .option-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
         }
 
+        /* 1v1 Zones */
         .player-zones {
             display: flex;
+            flex-direction: column;
             gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+            width: 100%;
         }
 
         .player-zone {
-            flex: 1;
-            min-width: 140px;
             background: rgba(0,0,0,0.2);
             padding: 15px;
             border-radius: 15px;
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .player-zone h3 { margin-bottom: 10px; font-size: 1rem; color: #00d2ff;}
-        .player-zone.p2 h3 { color: #ff9966; }
+        .p1-title { color: #00d2ff; font-size: 1rem; margin-bottom: 10px;}
+        .p2-title { color: #f5af19; font-size: 1rem; margin-bottom: 10px;}
+
+        .p1-btn { border-color: rgba(0, 210, 255, 0.5); }
+        .p2-btn { border-color: rgba(245, 175, 25, 0.5); }
 
         #timer {
             color: #ff5e62;
@@ -187,17 +193,11 @@
             font-weight: 800;
         }
 
-        /* Result Screen */
-        #result-screen h2 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
         @media (max-width: 600px) {
-            h1 { font-size: 2rem; }
-            .question-box { font-size: 3rem; }
-            .glass-panel { padding: 25px; width: 95%; }
-            .player-zones { flex-direction: column; }
+            h1 { font-size: 1.8rem; }
+            .question-box { font-size: 3.5rem; }
+            .glass-panel { padding: 20px; width: 95%; }
+            .option-btn { font-size: 1.2rem; padding: 12px 5px; }
         }
     </style>
 </head>
@@ -210,15 +210,19 @@
 
     <div id="main-menu" class="glass-panel hidden">
         <h1>Mega Oyun Portalı</h1>
-        <p style="margin-bottom: 30px; color: #ccc;">Sınırlarını zorlamaya hazır mısın?</p>
-        <button class="btn" onclick="showModeSelection()">Matematik Yarışı</button>
+        <p style="margin-bottom: 20px; color: #ddd;">Oynamak istediğin oyunu seç</p>
+        
+        <button class="btn" onclick="showModeSelection()">✖️ Matematik Yarışı</button>
+        <button class="btn btn-locked">🔒 Yeni Oyun (Yakında)</button>
+        <button class="btn btn-locked">🔒 Yeni Oyun (Yakında)</button>
     </div>
 
     <div id="mode-selection" class="glass-panel hidden">
-        <h1>Mod Seçimi</h1>
-        <button class="btn" onclick="startGame('single')">Tek Oyuncu</button>
-        <button class="btn btn-alt" onclick="startGame('1v1')">1v1 (İki Kişi)</button>
-        <button class="btn" style="background: transparent; border: 1px solid #fff; box-shadow: none;" onclick="goBack()">Geri Dön</button>
+        <h1>Matematik Yarışı</h1>
+        <p style="margin-bottom: 20px; color: #ddd;">Mod Seçimi</p>
+        <button class="btn btn-alt" onclick="startGame('single')">👤 Tek Oyuncu</button>
+        <button class="btn" onclick="startGame('1v1')">⚔️ 1v1 (İki Kişi)</button>
+        <button class="btn" style="background: transparent; border: 1px solid #fff; box-shadow: none; margin-top: 20px;" onclick="goBack()">Menüye Dön</button>
     </div>
 
     <div id="game-screen" class="glass-panel hidden">
@@ -229,34 +233,32 @@
         
         <div class="question-box" id="question-text">? x ?</div>
 
-        <div id="single-input" class="input-group hidden">
-            <input type="number" id="answer-input" placeholder="Cevap..." onkeypress="checkEnter(event, 'single')">
-            <button class="btn" onclick="checkAnswer('single')">Gönder</button>
+        <div id="single-input" class="hidden">
+            <div class="options-container" id="single-options">
+                </div>
         </div>
 
         <div id="1v1-input" class="player-zones hidden">
             <div class="player-zone">
-                <h3>Oyuncu 1</h3>
-                <input type="number" id="p1-input" placeholder="Cevap..." onkeypress="checkEnter(event, 'p1')">
-                <button class="btn" style="padding: 10px; font-size: 1rem; margin-top: 10px;" onclick="checkAnswer('p1')">Gönder</button>
+                <h3 class="p1-title">Oyuncu 1 Seçenekleri</h3>
+                <div class="options-container" id="p1-options"></div>
             </div>
-            <div class="player-zone p2">
-                <h3>Oyuncu 2</h3>
-                <input type="number" id="p2-input" placeholder="Cevap..." onkeypress="checkEnter(event, 'p2')">
-                <button class="btn btn-alt" style="padding: 10px; font-size: 1rem; margin-top: 10px;" onclick="checkAnswer('p2')">Gönder</button>
+            <div class="player-zone">
+                <h3 class="p2-title">Oyuncu 2 Seçenekleri</h3>
+                <div class="options-container" id="p2-options"></div>
             </div>
         </div>
     </div>
 
     <div id="result-screen" class="glass-panel hidden">
         <h1>Süre Doldu!</h1>
-        <h2 id="final-result-text">Skor</h2>
-        <p id="winner-text" style="font-size: 1.2rem; margin-bottom: 20px; color: #aaa;"></p>
-        <button class="btn" onclick="showMainMenu()">Ana Menüye Dön</button>
+        <h2 id="final-result-text" style="font-size: 2.5rem; margin: 15px 0;">Skor</h2>
+        <p id="winner-text" style="font-size: 1.2rem; margin-bottom: 25px; color: #ddd;"></p>
+        <button class="btn btn-alt" onclick="showMainMenu()">Ana Menüye Dön</button>
     </div>
 
     <script>
-        // Yükleme Ekranı Simülasyonu
+        // Yükleme Ekranı
         window.onload = () => {
             setTimeout(() => {
                 document.getElementById('loading-screen').style.opacity = '0';
@@ -264,18 +266,19 @@
                     document.getElementById('loading-screen').style.display = 'none';
                     document.getElementById('main-menu').classList.remove('hidden');
                 }, 500);
-            }, 2000); // 2 saniye yükleme ekranı
+            }, 2000);
         };
 
-        // Değişkenler
+        // Temel Değişkenler
         let currentMode = 'single';
         let timeLeft = 100;
         let timerInterval;
         let p1Score = 0;
         let p2Score = 0;
         let correctAnswer = 0;
+        let currentOptions = [];
 
-        // Navigasyon Fonksiyonları
+        // Menü Geçişleri
         function showModeSelection() {
             document.getElementById('main-menu').classList.add('hidden');
             document.getElementById('mode-selection').classList.remove('hidden');
@@ -291,7 +294,7 @@
             document.getElementById('main-menu').classList.remove('hidden');
         }
 
-        // Oyun Başlatma
+        // Oyunu Başlat
         function startGame(mode) {
             currentMode = mode;
             p1Score = 0;
@@ -304,68 +307,87 @@
             if(mode === 'single') {
                 document.getElementById('single-input').classList.remove('hidden');
                 document.getElementById('1v1-input').classList.add('hidden');
-                updateScoreDisplay();
             } else {
                 document.getElementById('single-input').classList.add('hidden');
                 document.getElementById('1v1-input').classList.remove('hidden');
-                updateScoreDisplay();
             }
 
+            updateScoreDisplay();
             generateQuestion();
             startTimer();
-            
-            // Focus on input
-            setTimeout(() => {
-                if(mode === 'single') document.getElementById('answer-input').focus();
-            }, 100);
         }
 
-        // Soru Üretme (Çarpma)
+        // Soru ve Şıkları Üret (Max 10x10)
         function generateQuestion() {
-            // Hızlı ve refleksif olması için 2 ile 12 arası sayılar
-            let num1 = Math.floor(Math.random() * 11) + 2; 
-            let num2 = Math.floor(Math.random() * 11) + 2;
+            // Maksimum 10 ile çarpma
+            let num1 = Math.floor(Math.random() * 10) + 1; 
+            let num2 = Math.floor(Math.random() * 10) + 1;
             correctAnswer = num1 * num2;
             document.getElementById('question-text').innerText = `${num1} x ${num2}`;
             
-            // Inputları temizle
-            document.getElementById('answer-input').value = '';
-            document.getElementById('p1-input').value = '';
-            document.getElementById('p2-input').value = '';
+            // Yanlış Şıkları Üret
+            let wrong1 = correctAnswer + (Math.floor(Math.random() * 10) + 1);
+            let wrong2 = correctAnswer - (Math.floor(Math.random() * 10) + 1);
+            if (wrong2 <= 0) wrong2 = correctAnswer + 15; // Negatif çıkmasın
+            
+            // Aynı şıkların çıkmasını engelle
+            if (wrong1 === wrong2 || wrong1 === correctAnswer) wrong1 += 2;
+            if (wrong2 === correctAnswer) wrong2 += 3;
+
+            // Şıkları diziye al ve karıştır
+            currentOptions = [correctAnswer, wrong1, wrong2];
+            currentOptions.sort(() => Math.random() - 0.5);
+
+            renderButtons();
         }
 
-        // Enter Tuşu Kontrolü
-        function checkEnter(event, player) {
-            if (event.key === "Enter") {
-                checkAnswer(player);
-            }
-        }
-
-        // Cevap Kontrolü
-        function checkAnswer(player) {
-            let inputId = player === 'single' ? 'answer-input' : (player === 'p1' ? 'p1-input' : 'p2-input');
-            let userAnswer = parseInt(document.getElementById(inputId).value);
-
-            if (userAnswer === correctAnswer) {
-                if (player === 'single' || player === 'p1') p1Score++;
-                if (player === 'p2') p2Score++;
-                
-                updateScoreDisplay();
-                generateQuestion();
-                
-                // Animasyon efekti
-                document.getElementById('question-text').style.color = '#38ef7d';
-                setTimeout(() => { document.getElementById('question-text').style.color = '#fff'; }, 200);
+        // Butonları Ekrana Çiz
+        function renderButtons() {
+            if (currentMode === 'single') {
+                let html = '';
+                currentOptions.forEach(opt => {
+                    html += `<button class="option-btn" onclick="checkAnswer(${opt}, 'p1')">${opt}</button>`;
+                });
+                document.getElementById('single-options').innerHTML = html;
             } else {
-                // Yanlış cevap efekti
-                document.getElementById(inputId).style.borderColor = '#ff5e62';
-                setTimeout(() => { document.getElementById(inputId).style.borderColor = 'rgba(255,255,255,0.3)'; }, 400);
-                document.getElementById(inputId).value = '';
+                let htmlP1 = '';
+                let htmlP2 = '';
+                currentOptions.forEach(opt => {
+                    htmlP1 += `<button class="option-btn p1-btn" onclick="checkAnswer(${opt}, 'p1')">${opt}</button>`;
+                    htmlP2 += `<button class="option-btn p2-btn" onclick="checkAnswer(${opt}, 'p2')">${opt}</button>`;
+                });
+                document.getElementById('p1-options').innerHTML = htmlP1;
+                document.getElementById('p2-options').innerHTML = htmlP2;
             }
-            document.getElementById(inputId).focus();
         }
 
-        // Skor Tablosu Güncelleme
+        // Cevap Kontrolü (Hata yapınca puan DÜŞMEZ)
+        function checkAnswer(selectedOption, player) {
+            if (selectedOption === correctAnswer) {
+                // Doğru bilindi, +10 puan ekle
+                if (player === 'p1') p1Score += 10;
+                if (player === 'p2') p2Score += 10;
+                
+                // Animasyon: Soru yeşil olsun
+                let qText = document.getElementById('question-text');
+                qText.style.color = '#38ef7d';
+                setTimeout(() => { qText.style.color = '#fff'; }, 300);
+
+                updateScoreDisplay();
+                generateQuestion(); // Doğru bilindiği için yeni soruya geç
+            } else {
+                // Yanlış cevap verildi: Puan düşmez, sadece buton kısa süreliğine kırmızı parlar
+                let qText = document.getElementById('question-text');
+                qText.style.color = '#ff5e62';
+                qText.style.transform = 'scale(0.9)';
+                setTimeout(() => { 
+                    qText.style.color = '#fff'; 
+                    qText.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }
+
+        // Skor Güncelleme
         function updateScoreDisplay() {
             if (currentMode === 'single') {
                 document.getElementById('score-display').innerText = `Puan: ${p1Score}`;
@@ -398,18 +420,18 @@
             let winnerText = document.getElementById('winner-text');
 
             if (currentMode === 'single') {
-                finalResultText.innerText = `Skorun: ${p1Score}`;
-                winnerText.innerText = "Tebrikler, harika yarıştın!";
+                finalResultText.innerText = `${p1Score} Puan`;
+                winnerText.innerText = "Süper bir antrenmandı!";
             } else {
-                finalResultText.innerText = `Skor: ${p1Score} - ${p2Score}`;
+                finalResultText.innerText = `${p1Score} - ${p2Score}`;
                 if (p1Score > p2Score) {
                     winnerText.innerText = "🏆 Oyuncu 1 Kazandı!";
                     winnerText.style.color = "#00d2ff";
                 } else if (p2Score > p1Score) {
                     winnerText.innerText = "🏆 Oyuncu 2 Kazandı!";
-                    winnerText.style.color = "#ff9966";
+                    winnerText.style.color = "#f5af19";
                 } else {
-                    winnerText.innerText = "🤝 Berabere Bitti!";
+                    winnerText.innerText = "🤝 Berabere!";
                     winnerText.style.color = "#fff";
                 }
             }
