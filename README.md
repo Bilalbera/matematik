@@ -1,1 +1,0 @@
-bilalbera.github.io/matematik/
