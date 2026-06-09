@@ -1,174 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6th Grade English Quiz 2026</title>
-    <style>
-        :root {
-            --primary: #6c5ce7;
-            --success: #00b894;
-            --danger: #d63031;
-            --bg: #dfe6e9;
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        #quiz-card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 500px;
-        }
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-weight: bold;
-            color: #636e72;
-        }
-        #question-text {
-            font-size: 1.3rem;
-            margin-bottom: 25px;
-            color: #2d3436;
-            min-height: 60px;
-        }
-        .options-grid {
-            display: grid;
-            gap: 12px;
-        }
-        button.opt {
-            padding: 15px;
-            border: 2px solid #edeff2;
-            border-radius: 12px;
-            background: #f9f9f9;
-            cursor: pointer;
-            font-size: 1rem;
-            text-align: left;
-            transition: all 0.3s ease;
-        }
-        button.opt:hover {
-            background: #eef2ff;
-            border-color: var(--primary);
-        }
-        .correct { background-color: var(--success) !important; color: white; border-color: var(--success) !important; }
-        .wrong { background-color: var(--danger) !important; color: white; border-color: var(--danger) !important; }
-        #final-screen { display: none; text-align: center; }
-        .score-display { font-size: 3rem; color: var(--primary); margin: 20px 0; }
-        .restart-btn {
-            background: var(--primary);
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.1rem;
-        }
-    </style>
+    <title>Matematik Yarışı</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div id="quiz-card">
-    <div id="game-ui">
-        <div class="stats">
-            <span>Question: <span id="q-count">1</span>/10</span>
-            <span>Score: <span id="current-score">0</span></span>
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <h1 class="loading-title">Yükleniyor...</h1>
+        <div class="credit">Bilal Bera Cantekin tarafından yapıldı</div>
+    </div>
+
+    <div id="main-menu" class="screen hidden">
+        <h1 class="title">Oyunlar</h1>
+        <div class="menu-buttons">
+            <button class="btn primary-btn" onclick="showModeSelection()">Matematik Yarışı Oyna</button>
         </div>
-        <div id="question-text">Loading question...</div>
-        <div class="options-grid" id="options"></div>
     </div>
 
-    <div id="final-screen">
-        <h2>Quiz Completed!</h2>
-        <div class="score-display"><span id="total-score">0</span> / 100</div>
-        <p id="feedback-msg"></p>
-        <button class="restart-btn" onclick="location.reload()">Try Again</button>
+    <div id="mode-selection" class="screen hidden">
+        <h2 class="title">Oyun Modu</h2>
+        <div class="menu-buttons">
+            <button class="btn action-btn" onclick="startGame('single')">Tek Oyunculu</button>
+            <button class="btn action-btn" onclick="startGame('1v1')">İki Kişi (1v1)</button>
+            <button class="btn back-btn" onclick="showMainMenu()">Geri</button>
+        </div>
     </div>
-</div>
 
-<script>
-    const englishQuestions = [
-        { q: "I love eating ____ and honey at breakfast. It is my favorite!", a: "butter", opts: ["olives", "butter", "salami", "cereal"] },
-        { q: "A: Can I have some more orange juice? <br> B: Sorry, ____. It's all gone.", a: "it's all finished", opts: ["enjoy it", "sure", "it's all finished", "yes, please"] },
-        { q: "My father is ____ the car in the garden right now.", a: "washing", opts: ["wash", "washes", "washing", "washed"] },
-        { q: "Downtown is ____ than the village. There are many cars.", a: "noisier", opts: ["noisier", "quiet", "more quiet", "noisy"] },
-        { q: "How do you feel in rainy weather?", a: "I feel moody", opts: ["It is hot", "I feel moody", "I like sun", "No, I don't"] },
-        { q: "What time is it? (08:30)", a: "It is half past eight", opts: ["It is quarter past eight", "It is eight o'clock", "It is half past eight", "It is ten to eight"] },
-        { q: "Which one is a 'healthy' food?", a: "Cucumber", opts: ["Chips", "Cucumber", "Donut", "Muffin"] },
-        { q: "A: ____ does he go to the gym? <br> B: Twice a week.", a: "How often", opts: ["Where", "What time", "When", "How often"] },
-        { q: "The weather is ____ in Erzurum in winter. It's -10 degrees.", a: "freezing", opts: ["freezing", "hot", "sunny", "windy"] },
-        { q: "She ____ her teeth every morning.", a: "brushes", opts: ["brush", "brushing", "brushes", "is brushing"] }
-    ];
-
-    let currentIndex = 0;
-    let score = 0;
-
-    function startQuiz() {
-        const q = englishQuestions[currentIndex];
-        document.getElementById("q-count").innerText = currentIndex + 1;
-        document.getElementById("question-text").innerHTML = q.q;
-        const optContainer = document.getElementById("options");
-        optContainer.innerHTML = "";
-
-        q.opts.forEach((o, i) => {
-            const btn = document.createElement("button");
-            btn.classList.add("opt");
-            btn.innerHTML = `<b>${String.fromCharCode(65+i)})</b> ${o}`;
-            btn.onclick = () => check(o, btn);
-            optContainer.appendChild(btn);
-        });
-    }
-
-    function check(choice, btn) {
-        const correct = englishQuestions[currentIndex].a;
-        const allBtns = document.querySelectorAll(".opt");
-        allBtns.forEach(b => b.disabled = true);
-
-        if(choice === correct) {
-            btn.classList.add("correct");
-            // Rastgele puan: 9-11 arası vererek 100'e yaklaştırıyoruz
-            let randomStep = Math.floor(Math.random() * 3) + 9; 
-            score += randomStep;
-            if(currentIndex === 9 && score < 100 && score > 85) score = 100; // Son soruda 100'e tamamla
-        } else {
-            btn.classList.add("wrong");
-            allBtns.forEach(b => {
-                if(b.innerText.includes(correct)) b.classList.add("correct");
-            });
-        }
-
-        document.getElementById("current-score").innerText = score;
-
-        setTimeout(() => {
-            currentIndex++;
-            if(currentIndex < englishQuestions.length) {
-                startQuiz();
-            } else {
-                finish();
-            }
-        }, 1500);
-    }
-
-    function finish() {
-        document.getElementById("game-ui").style.display = "none";
-        document.getElementById("final-screen").style.display = "block";
-        if(score > 100) score = 100;
-        document.getElementById("total-score").innerText = score;
+    <div id="game-screen" class="screen hidden">
+        <div id="timer-box">Süre: <span id="time-left">100</span>s</div>
         
-        let msg = score >= 70 ? "Great Job! 🌟" : "Keep Practicing! 📚";
-        document.getElementById("feedback-msg").innerText = msg;
-    }
+        <div id="players-container">
+            <div id="player1-area" class="player-card">
+                <div class="score-box">Oyuncu 1: <span id="score1">0</span></div>
+                <div class="question" id="q1">? x ?</div>
+                <div class="options" id="options1"></div>
+            </div>
 
-    startQuiz();
-</script>
+            <div id="player2-area" class="player-card hidden">
+                <div class="score-box">Oyuncu 2: <span id="score2">0</span></div>
+                <div class="question" id="q2">? x ?</div>
+                <div class="options" id="options2"></div>
+            </div>
+        </div>
+    </div>
 
+    <div id="result-screen" class="screen hidden">
+        <h2 class="title">Süre Bitti!</h2>
+        <div id="final-result" class="result-text"></div>
+        <button class="btn primary-btn" onclick="showMainMenu()">Ana Menüye Dön</button>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
