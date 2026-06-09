@@ -42,7 +42,7 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             padding: 30px;
             width: 95%;
-            max-width: 700px; /* Yan yana sığması için biraz genişletildi */
+            max-width: 700px;
             text-align: center;
             transition: all 0.4s ease;
         }
@@ -191,7 +191,7 @@
             flex-direction: row;
         }
 
-        /* Dikey butonlar (1v1 için) */
+        /* Dikey butonlar */
         .col-options {
             flex-direction: column; 
         }
@@ -243,13 +243,13 @@
         /* YAN YANA (Side-by-Side) Düzen */
         .player-zones {
             display: flex;
-            flex-direction: row; /* Yan Yana Yapan Kod */
+            flex-direction: row;
             gap: 15px;
             width: 100%;
         }
 
         .player-zone {
-            flex: 1; /* Eşit şekilde bölüşürler */
+            flex: 1;
             background: rgba(0,0,0,0.2);
             padding: 15px;
             border-radius: 15px;
@@ -258,8 +258,39 @@
             flex-direction: column;
         }
 
-        .p1-title { color: #00d2ff; font-size: 1.1rem; margin-bottom: 5px;}
-        .p2-title { color: #f5af19; font-size: 1.1rem; margin-bottom: 5px;}
+        /* Oyuncu Başlığı ve Puanı Stilize */
+        .zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .p1-title { 
+            color: #00d2ff; 
+            font-size: 1.1rem; 
+            font-weight: 600;
+        }
+        
+        .p2-title { 
+            color: #f5af19; 
+            font-size: 1.1rem; 
+            font-weight: 600;
+        }
+
+        .zone-score {
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .p1-score {
+            color: #00d2ff;
+        }
+
+        .p2-score {
+            color: #f5af19;
+        }
 
         .p1-btn { border-color: rgba(0, 210, 255, 0.3); }
         .p2-btn { border-color: rgba(245, 175, 25, 0.3); }
@@ -348,7 +379,7 @@
     <div id="game-screen" class="glass-panel hidden">
         <div class="header-info">
             <span id="score-display">Puan: 0</span>
-            <span id="timer">100s</span>
+            <span id="timer">60s</span>
         </div>
         
         <div id="single-player-area" class="hidden">
@@ -359,13 +390,19 @@
 
         <div id="1v1-player-area" class="player-zones hidden">
             <div class="player-zone">
-                <h3 class="p1-title">Oyuncu 1</h3>
+                <div class="zone-header">
+                    <h3 class="p1-title">Oyuncu 1</h3>
+                    <span class="zone-score p1-score" id="p1-zone-score">Puan: 0</span>
+                </div>
                 <div class="zone-question" id="p1-question">? x ?</div>
                 <div class="options-container col-options" id="p1-options"></div>
                 <div id="p1-error" class="error-msg-box"></div>
             </div>
             <div class="player-zone">
-                <h3 class="p2-title">Oyuncu 2</h3>
+                <div class="zone-header">
+                    <h3 class="p2-title">Oyuncu 2</h3>
+                    <span class="zone-score p2-score" id="p2-zone-score">Puan: 0</span>
+                </div>
                 <div class="zone-question" id="p2-question">? x ?</div>
                 <div class="options-container col-options" id="p2-options"></div>
                 <div id="p2-error" class="error-msg-box"></div>
@@ -496,7 +533,7 @@
         };
 
         let currentMode = 'single';
-        let timeLeft = 100;
+        let timeLeft = 60;
         let timerInterval;
         
         let p1Score = 0;
@@ -531,7 +568,7 @@
         function startGame(mode) {
             currentMode = mode;
             p1Score = 0; p2Score = 0;
-            timeLeft = 100;
+            timeLeft = 60;
             p1ConsecutiveErrors = 0; p2ConsecutiveErrors = 0;
             p1InCooldown = false; p2InCooldown = false;
             
@@ -630,7 +667,7 @@
                     p1ConsecutiveErrors = 0;
                     playDingSound();
                     animateCorrect('p1-question');
-                    generateQuestion('p1'); // Sadece P1'in sorusunu yenile
+                    generateQuestion('p1');
                 } else {
                     p1ConsecutiveErrors++;
                     playBuzzerSound();
@@ -643,7 +680,7 @@
                     p2ConsecutiveErrors = 0;
                     playDingSound();
                     animateCorrect('p2-question');
-                    generateQuestion('p2'); // Sadece P2'nin sorusunu yenile
+                    generateQuestion('p2');
                 } else {
                     p2ConsecutiveErrors++;
                     playBuzzerSound();
@@ -715,6 +752,8 @@
                 document.getElementById('score-display').innerText = `Puan: ${p1Score}`;
             } else {
                 document.getElementById('score-display').innerText = `O1: ${p1Score} | O2: ${p2Score}`;
+                document.getElementById('p1-zone-score').innerText = `Puan: ${p1Score}`;
+                document.getElementById('p2-zone-score').innerText = `Puan: ${p2Score}`;
             }
         }
 
