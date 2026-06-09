@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matematik Yarışı</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <h1 class="loading-title">Yükleniyor...</h1>
+        <div class="credit">Bilal Bera Cantekin tarafından yapıldı</div>
+    </div>
+
+    <div id="main-menu" class="screen hidden">
+        <h1 class="title">Oyunlar</h1>
+        <div class="menu-buttons">
+            <button class="btn primary-btn" onclick="showModeSelection()">Matematik Yarışı Oyna</button>
+        </div>
+    </div>
+
+    <div id="mode-selection" class="screen hidden">
+        <h2 class="title">Oyun Modu</h2>
+        <div class="menu-buttons">
+            <button class="btn action-btn" onclick="startGame('single')">Tek Oyunculu</button>
+            <button class="btn action-btn" onclick="startGame('1v1')">İki Kişi (1v1)</button>
+            <button class="btn back-btn" onclick="showMainMenu()">Geri</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        <div id="timer-box">Süre: <span id="time-left">100</span>s</div>
+        
+        <div id="players-container">
+            <div id="player1-area" class="player-card">
+                <div class="score-box">Oyuncu 1: <span id="score1">0</span></div>
+                <div class="question" id="q1">? x ?</div>
+                <div class="options" id="options1"></div>
+            </div>
+
+            <div id="player2-area" class="player-card hidden">
+                <div class="score-box">Oyuncu 2: <span id="score2">0</span></div>
+                <div class="question" id="q2">? x ?</div>
+                <div class="options" id="options2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-screen" class="screen hidden">
+        <h2 class="title">Süre Bitti!</h2>
+        <div id="final-result" class="result-text"></div>
+        <button class="btn primary-btn" onclick="showMainMenu()">Ana Menüye Dön</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
