@@ -151,7 +151,7 @@
         /* Game UI */
         .header-info {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 15px;
@@ -378,7 +378,6 @@
 
     <div id="game-screen" class="glass-panel hidden">
         <div class="header-info">
-            <span id="score-display">Puan: 0</span>
             <span id="timer">60s</span>
         </div>
         
@@ -414,7 +413,7 @@
         <h1>Süre Doldu!</h1>
         <h2 id="final-result-text" style="font-size: 2.5rem; margin: 15px 0;">Skor</h2>
         <p id="winner-text" style="font-size: 1.2rem; margin-bottom: 25px; color: #ddd;"></p>
-        <button class="btn mode-btn-alt" onclick="showMainMenu()">Ana Menüye Dön</button>
+        <button class="btn mode-btn-alt" id="result-button">Tekrar Oyna</button>
     </div>
 
     <script>
@@ -562,7 +561,7 @@
 
         function showMainMenu() {
             document.getElementById('result-screen').classList.add('hidden');
-            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('mode-selection').classList.remove('hidden');
         }
 
         function startGame(mode) {
@@ -749,9 +748,8 @@
 
         function updateScoreDisplay() {
             if (currentMode === 'single') {
-                document.getElementById('score-display').innerText = `Puan: ${p1Score}`;
+                // Tek oyuncu modunda hiçbir şey gösterilmiyor
             } else {
-                document.getElementById('score-display').innerText = `O1: ${p1Score} | O2: ${p2Score}`;
                 document.getElementById('p1-zone-score').innerText = `Puan: ${p1Score}`;
                 document.getElementById('p2-zone-score').innerText = `Puan: ${p2Score}`;
             }
@@ -778,10 +776,13 @@
 
             let finalResultText = document.getElementById('final-result-text');
             let winnerText = document.getElementById('winner-text');
+            let resultButton = document.getElementById('result-button');
 
             if (currentMode === 'single') {
                 finalResultText.innerText = `${p1Score} Puan`;
                 winnerText.innerText = "Harika antrenmandı!";
+                resultButton.innerText = "Tekrar Oyna";
+                resultButton.onclick = function() { startGame('single'); };
             } else {
                 finalResultText.innerText = `${p1Score} - ${p2Score}`;
                 if (p1Score > p2Score) {
@@ -794,6 +795,8 @@
                     winnerText.innerText = "🤝 Berabere!";
                     winnerText.style.color = "#fff";
                 }
+                resultButton.innerText = "Tekrar Oyna";
+                resultButton.onclick = function() { startGame('1v1'); };
             }
         }
     </script>
