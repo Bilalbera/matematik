@@ -3,39 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matematik Yarışı</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Elite Math Arena | Pro Portal</title>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --glass: rgba(255, 255, 255, 0.05);
+            --accent: #6366f1;
+            --text: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+
+        /* Loader */
+        #loader { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.5s; }
+        .spinner { width: 60px; height: 60px; border: 4px solid var(--glass); border-top: 4px solid var(--accent); border-radius: 50%; animation: rot 1s linear infinite; }
+        @keyframes rot { to { transform: rotate(360deg); } }
+
+        /* Screens */
+        .screen { display: none; width: 100%; max-width: 600px; padding: 40px; border-radius: 24px; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+        .active { display: block; animation: fade 0.5s; }
+        @keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* UI Elements */
+        button { width: 100%; padding: 18px; margin: 10px 0; border: none; border-radius: 12px; background: var(--accent); color: white; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        button:hover { transform: scale(1.02); filter: brightness(1.2); }
+        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .p-card { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 16px; text-align: center; }
+    </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <p>Bilal Bera Cantekin tarafından yapıldı</p>
+        <p style="margin-top: 20px; opacity: 0.6;">Bilal Bera Cantekin tarafından yapıldı</p>
     </div>
 
-    <main id="app">
-        <div id="menu" class="screen active">
-            <h1>Matematik Yarışı</h1>
-            <button onclick="showModeSelection()">Oyuna Başla</button>
-        </div>
+    <div id="screen-menu" class="screen active">
+        <h1 style="text-align: center; margin-bottom: 30px;">MATHEMATIC ARENA</h1>
+        <button onclick="showScreen('screen-mode')">Matematik Yarışı</button>
+    </div>
 
-        <div id="mode-selection" class="screen">
-            <h2>Mod Seçin</h2>
-            <button onclick="startGame('single')">Tek Oyuncu</button>
-            <button onclick="startGame('multi')">İki Kişi (1v1)</button>
-        </div>
+    <div id="screen-mode" class="screen">
+        <h2 style="text-align: center;">Oyun Modu</h2>
+        <button onclick="startGame('single')">Tek Oyuncu</button>
+        <button onclick="startGame('multi')">İki Kişi (1v1)</button>
+    </div>
 
-        <div id="game-screen" class="screen">
-            <div id="timer">100</div>
-            <div id="game-container">
-                <div id="player1-area" class="player-zone"></div>
-                <div id="question-box">? x ?</div>
-                <div id="player2-area" class="player-zone"></div>
-            </div>
-            <input type="number" id="answer-input" placeholder="Cevap" autofocus>
+    <div id="screen-game" class="screen">
+        <div style="display:flex; justify-content: space-between;">
+            <span id="timer" style="font-size: 1.5rem; font-weight: bold;">100</span>
+            <span id="q-text" style="font-size: 1.5rem;">? x ?</span>
         </div>
-    </main>
+        <div class="game-grid">
+            <div class="p-card">P1: <span id="s1">0</span></div>
+            <div class="p-card">P2: <span id="s2">0</span></div>
+        </div>
+        <input type="number" id="input" style="width: 100%; margin-top: 20px; padding: 15px; border-radius: 8px; border: none;" placeholder="Cevap gir...">
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        const screens = { menu: 'screen-menu', mode: 'screen-mode', game: 'screen-game' };
+        
+        // Loader mantığı
+        window.addEventListener('load', () => setTimeout(() => document.getElementById('loader').style.opacity = '0', 2000));
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startGame(mode) {
+            showScreen(screens.game);
+            let time = 100;
+            const timerEl = document.getElementById('timer');
+            const interval = setInterval(() => {
+                time--;
+                timerEl.innerText = time;
+                if(time < 10) timerEl.style.color = 'red';
+                if(time === 0) clearInterval(interval);
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
