@@ -138,6 +138,7 @@
             font-weight: 800;
             margin: 15px 0;
             text-shadow: 0 0 15px rgba(255,255,255,0.4);
+            transition: transform 0.2s, color 0.2s;
         }
 
         /* Options Grid */
@@ -146,6 +147,7 @@
             gap: 10px;
             justify-content: center;
             margin-top: 20px;
+            transition: all 0.3s ease;
         }
 
         .option-btn {
@@ -166,6 +168,34 @@
             transform: scale(0.95);
         }
 
+        /* Cooldown State */
+        .cooldown-active {
+            opacity: 0.3;
+            pointer-events: none; /* Butonlara basılmasını engeller */
+            filter: blur(1px);
+        }
+
+        /* Error Text Structure */
+        .error-msg-box {
+            color: #ff5e62;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            min-height: 25px; /* Ekranın kaymasını engellemek için sabit alan */
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255, 94, 98, 0.4);
+        }
+
+        .shake-effect {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
         /* 1v1 Zones */
         .player-zones {
             display: flex;
@@ -181,11 +211,11 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .p1-title { color: #00d2ff; font-size: 1rem; margin-bottom: 10px;}
-        .p2-title { color: #f5af19; font-size: 1rem; margin-bottom: 10px;}
+        .p1-title { color: #00d2ff; font-size: 1rem; margin-bottom: 5px;}
+        .p2-title { color: #f5af19; font-size: 1rem; margin-bottom: 5px;}
 
-        .p1-btn { border-color: rgba(0, 210, 255, 0.5); }
-        .p2-btn { border-color: rgba(245, 175, 25, 0.5); }
+        .p1-btn { border-color: rgba(0, 210, 255, 0.3); }
+        .p2-btn { border-color: rgba(245, 175, 25, 0.3); }
 
         #timer {
             color: #ff5e62;
@@ -234,18 +264,20 @@
         <div class="question-box" id="question-text">? x ?</div>
 
         <div id="single-input" class="hidden">
-            <div class="options-container" id="single-options">
-                </div>
+            <div class="options-container" id="single-options"></div>
+            <div id="single-error" class="error-msg-box"></div>
         </div>
 
         <div id="1v1-input" class="player-zones hidden">
             <div class="player-zone">
-                <h3 class="p1-title">Oyuncu 1 Seçenekleri</h3>
+                <h3 class="p1-title">Oyuncu 1</h3>
                 <div class="options-container" id="p1-options"></div>
+                <div id="p1-error" class="error-msg-box"></div>
             </div>
             <div class="player-zone">
-                <h3 class="p2-title">Oyuncu 2 Seçenekleri</h3>
+                <h3 class="p2-title">Oyuncu 2</h3>
                 <div class="options-container" id="p2-options"></div>
+                <div id="p2-error" class="error-msg-box"></div>
             </div>
         </div>
     </div>
@@ -269,7 +301,7 @@
             }, 2000);
         };
 
-        // Temel Değişkenler
+        // Değişkenler
         let currentMode = 'single';
         let timeLeft = 100;
         let timerInterval;
@@ -278,7 +310,14 @@
         let correctAnswer = 0;
         let currentOptions = [];
 
-        // Menü Geçişleri
+        // Hata ve Kilitlenme (Ceza) Takibi
+        let p1ConsecutiveErrors = 0;
+        let p2ConsecutiveErrors = 0;
+        let p1InCooldown = false;
+        let p2InCooldown = false;
+
+        let p1ErrorTimeout, p2ErrorTimeout;
+
         function showModeSelection() {
             document.getElementById('main-menu').classList.add('hidden');
             document.getElementById('mode-selection').classList.remove('hidden');
@@ -294,13 +333,24 @@
             document.getElementById('main-menu').classList.remove('hidden');
         }
 
-        // Oyunu Başlat
         function startGame(mode) {
             currentMode = mode;
             p1Score = 0;
             p2Score = 0;
             timeLeft = 100;
+            p1ConsecutiveErrors = 0;
+            p2ConsecutiveErrors = 0;
+            p1InCooldown = false;
+            p2InCooldown = false;
             
+            // UI Temizliği
+            document.getElementById('single-error').innerText = '';
+            document.getElementById('p1-error').innerText = '';
+            document.getElementById('p2-error').innerText = '';
+            document.getElementById('single-options').classList.remove('cooldown-active');
+            document.getElementById('p1-options').classList.remove('cooldown-active');
+            document.getElementById('p2-options').classList.remove('cooldown-active');
+
             document.getElementById('mode-selection').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
             
@@ -317,31 +367,25 @@
             startTimer();
         }
 
-        // Soru ve Şıkları Üret (Max 10x10)
         function generateQuestion() {
-            // Maksimum 10 ile çarpma
             let num1 = Math.floor(Math.random() * 10) + 1; 
             let num2 = Math.floor(Math.random() * 10) + 1;
             correctAnswer = num1 * num2;
             document.getElementById('question-text').innerText = `${num1} x ${num2}`;
             
-            // Yanlış Şıkları Üret
-            let wrong1 = correctAnswer + (Math.floor(Math.random() * 10) + 1);
-            let wrong2 = correctAnswer - (Math.floor(Math.random() * 10) + 1);
-            if (wrong2 <= 0) wrong2 = correctAnswer + 15; // Negatif çıkmasın
+            let wrong1 = correctAnswer + (Math.floor(Math.random() * 8) + 1);
+            let wrong2 = correctAnswer - (Math.floor(Math.random() * 8) + 1);
+            if (wrong2 <= 0) wrong2 = correctAnswer + 12;
             
-            // Aynı şıkların çıkmasını engelle
             if (wrong1 === wrong2 || wrong1 === correctAnswer) wrong1 += 2;
             if (wrong2 === correctAnswer) wrong2 += 3;
 
-            // Şıkları diziye al ve karıştır
             currentOptions = [correctAnswer, wrong1, wrong2];
             currentOptions.sort(() => Math.random() - 0.5);
 
             renderButtons();
         }
 
-        // Butonları Ekrana Çiz
         function renderButtons() {
             if (currentMode === 'single') {
                 let html = '';
@@ -361,33 +405,90 @@
             }
         }
 
-        // Cevap Kontrolü (Hata yapınca puan DÜŞMEZ)
+        // Cevap Kontrol Mekanizması
         function checkAnswer(selectedOption, player) {
+            // Eğer oyuncu kilit altındaysa hiçbir şey yapma
+            if (player === 'p1' && p1InCooldown) return;
+            if (player === 'p2' && p2InCooldown) return;
+
             if (selectedOption === correctAnswer) {
-                // Doğru bilindi, +10 puan ekle
-                if (player === 'p1') p1Score += 10;
-                if (player === 'p2') p2Score += 10;
+                // Doğru cevap seriyi sıfırlar
+                if (player === 'p1') { p1Score += 10; p1ConsecutiveErrors = 0; }
+                if (player === 'p2') { p2Score += 10; p2ConsecutiveErrors = 0; }
                 
-                // Animasyon: Soru yeşil olsun
                 let qText = document.getElementById('question-text');
                 qText.style.color = '#38ef7d';
                 setTimeout(() => { qText.style.color = '#fff'; }, 300);
 
                 updateScoreDisplay();
-                generateQuestion(); // Doğru bilindiği için yeni soruya geç
+                generateQuestion();
             } else {
-                // Yanlış cevap verildi: Puan düşmez, sadece buton kısa süreliğine kırmızı parlar
-                let qText = document.getElementById('question-text');
-                qText.style.color = '#ff5e62';
-                qText.style.transform = 'scale(0.9)';
-                setTimeout(() => { 
-                    qText.style.color = '#fff'; 
-                    qText.style.transform = 'scale(1)';
-                }, 200);
+                // Yanlış cevap durumları
+                if (player === 'p1') {
+                    p1ConsecutiveErrors++;
+                    triggerErrorFeedback('p1');
+                } else if (player === 'p2') {
+                    p2ConsecutiveErrors++;
+                    triggerErrorFeedback('p2');
+                }
             }
         }
 
-        // Skor Güncelleme
+        // Hata Bildirimi ve Ceza Kontrolü
+        function triggerErrorFeedback(player) {
+            let errorBoxId = currentMode === 'single' ? 'single-error' : `${player}-error`;
+            let optionsBoxId = currentMode === 'single' ? 'single-options' : `${player}-options`;
+            
+            let errorBox = document.getElementById(errorBoxId);
+            let optionsBox = document.getElementById(optionsBoxId);
+            let currentErrCount = player === 'p1' ? p1ConsecutiveErrors : p2ConsecutiveErrors;
+
+            // Ekran sallama efekti
+            errorBox.classList.remove('shake-effect');
+            void errorBox.offsetWidth; // DOM'u tetikle ki animasyon baştan oynasın
+            errorBox.classList.add('shake-effect');
+
+            if (currentErrCount >= 3) {
+                // 3 Üst üste hata yapıldı -> 3 Saniye Ceza Başlat
+                if (player === 'p1') p1InCooldown = true;
+                if (player === 'p2') p2InCooldown = true;
+
+                optionsBox.classList.add('cooldown-active');
+                
+                let secondsLeft = 3;
+                errorBox.innerText = `🚨 3 Hata! ${secondsLeft}sn Bekle...`;
+                errorBox.style.color = '#ff5e62';
+
+                let cooldownTimer = setInterval(() => {
+                    secondsLeft--;
+                    if (secondsLeft <= 0) {
+                        clearInterval(cooldownTimer);
+                        // Cezayı kaldır
+                        if (player === 'p1') { p1InCooldown = false; p1ConsecutiveErrors = 0; }
+                        if (player === 'p2') { p2InCooldown = false; p2ConsecutiveErrors = 0; }
+                        optionsBox.classList.remove('cooldown-active');
+                        errorBox.innerText = '';
+                    } else {
+                        errorBox.innerText = `🚨 3 Hata! ${secondsLeft}sn Bekle...`;
+                    }
+                }, 1000);
+
+            } else {
+                // Normal hata mesajı yazısı (Üst üste 3 olana kadar)
+                errorBox.innerText = '⚠️ Hata Yaptın!';
+                errorBox.style.color = '#ff9966';
+
+                // Belirli bir süre sonra yazının kaybolması için timeout temizle/yenile
+                if (player === 'p1') {
+                    clearTimeout(p1ErrorTimeout);
+                    p1ErrorTimeout = setTimeout(() => { if(!p1InCooldown) errorBox.innerText = ''; }, 1200);
+                } else {
+                    clearTimeout(p2ErrorTimeout);
+                    p2ErrorTimeout = setTimeout(() => { if(!p2InCooldown) errorBox.innerText = ''; }, 1200);
+                }
+            }
+        }
+
         function updateScoreDisplay() {
             if (currentMode === 'single') {
                 document.getElementById('score-display').innerText = `Puan: ${p1Score}`;
@@ -396,7 +497,6 @@
             }
         }
 
-        // Zamanlayıcı
         function startTimer() {
             document.getElementById('timer').innerText = `${timeLeft}s`;
             clearInterval(timerInterval);
@@ -411,7 +511,6 @@
             }, 1000);
         }
 
-        // Oyun Bitişi
         function endGame() {
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
@@ -421,7 +520,7 @@
 
             if (currentMode === 'single') {
                 finalResultText.innerText = `${p1Score} Puan`;
-                winnerText.innerText = "Süper bir antrenmandı!";
+                winnerText.innerText = "Harika antrenmandı, reflekslerin gelişiyor!";
             } else {
                 finalResultText.innerText = `${p1Score} - ${p2Score}`;
                 if (p1Score > p2Score) {
@@ -431,7 +530,7 @@
                     winnerText.innerText = "🏆 Oyuncu 2 Kazandı!";
                     winnerText.style.color = "#f5af19";
                 } else {
-                    winnerText.innerText = "🤝 Berabere!";
+                    winnerText.innerText = "🤝 Muazzam Beraberlik!";
                     winnerText.style.color = "#fff";
                 }
             }
