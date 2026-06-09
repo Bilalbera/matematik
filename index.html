@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mega Portal | Oyun Seçimi</title>
+    <title>Matematik Çarpma Oyunu</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -151,7 +151,7 @@
         /* Game UI */
         .header-info {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 15px;
@@ -371,13 +371,14 @@
         <p style="margin-bottom: 20px; color: #ddd;">Mod Seçimi</p>
         <div class="mode-buttons-container">
             <button class="mode-btn mode-btn-alt" onclick="startGame('single')">👤 Tek Oyuncu</button>
-            <button class="mode-btn" onclick="startGame('1v1')">⚔️ 2 Kişi (1v1)</button>
+            <button class="mode-btn" onclick="startGame('1v1')">⚔️ 2 Oyuncu (1v1)</button>
         </div>
         <button class="btn" style="background: transparent; border: 1px solid #fff; box-shadow: none; margin-top: 20px;" onclick="goBack()">Menüye Dön</button>
     </div>
 
     <div id="game-screen" class="glass-panel hidden">
         <div class="header-info">
+            <span id="score-display">Puan: 0</span>
             <span id="timer">60s</span>
         </div>
         
@@ -413,7 +414,7 @@
         <h1>Süre Doldu!</h1>
         <h2 id="final-result-text" style="font-size: 2.5rem; margin: 15px 0;">Skor</h2>
         <p id="winner-text" style="font-size: 1.2rem; margin-bottom: 25px; color: #ddd;"></p>
-        <button class="btn mode-btn-alt" onclick="showModeSelection()">Mod Seçimi</button>
+        <button class="btn mode-btn-alt" onclick="showMainMenu()">Ana Menüye Dön</button>
     </div>
 
     <script>
@@ -550,13 +551,17 @@
         let p1ErrorTimeout, p2ErrorTimeout;
 
         function showModeSelection() {
-            document.getElementById('result-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('main-menu').classList.add('hidden');
             document.getElementById('mode-selection').classList.remove('hidden');
         }
 
         function goBack() {
             document.getElementById('mode-selection').classList.add('hidden');
+            document.getElementById('main-menu').classList.remove('hidden');
+        }
+
+        function showMainMenu() {
+            document.getElementById('result-screen').classList.add('hidden');
             document.getElementById('main-menu').classList.remove('hidden');
         }
 
@@ -744,8 +749,9 @@
 
         function updateScoreDisplay() {
             if (currentMode === 'single') {
-                // Tek oyuncu modunda hiçbir şey gösterilmiyor
+                document.getElementById('score-display').innerText = `Puan: ${p1Score}`;
             } else {
+                document.getElementById('score-display').innerText = `O1: ${p1Score} | O2: ${p2Score}`;
                 document.getElementById('p1-zone-score').innerText = `Puan: ${p1Score}`;
                 document.getElementById('p2-zone-score').innerText = `Puan: ${p2Score}`;
             }
