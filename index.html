@@ -6,144 +6,577 @@
     <title>Mega Portal | Oyun Seçimi</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: linear-gradient(135deg, #1f1c2c, #928dab); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        
-        /* Glassmorphism Panel */
-        .glass-panel { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); padding: 30px; width: 95%; max-width: 700px; text-align: center; transition: all 0.4s ease; }
-        h1 { font-size: 2.2rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); background: -webkit-linear-gradient(#f12711, #f5af19); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn { background: linear-gradient(45deg, #11998e, #38ef7d); border: none; padding: 15px 20px; border-radius: 15px; color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin: 10px 0; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4); width: 100%; max-width: 400px; }
-        .btn:active { transform: scale(0.95); }
-        .btn-alt { background: linear-gradient(45deg, #4facfe, #00f2fe); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); }
-        .btn-locked { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); box-shadow: none; cursor: not-allowed; border: 1px dashed rgba(255,255,255,0.3); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        /* Loading Screen & Progress Bar */
-        #loading-screen { position: fixed; inset: 0; background: #1f1c2c; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease; }
-        .progress-container { width: 80%; max-width: 400px; height: 25px; background: rgba(255,255,255,0.1); border-radius: 15px; margin: 20px 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #f12711, #f5af19); transition: width 0.1s; }
-        .creator-text { font-size: 1rem; color: #ccc; letter-spacing: 1px; }
+        body {
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 30px;
+            width: 95%;
+            max-width: 700px; /* Yan yana sığması için biraz genişletildi */
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            background: -webkit-linear-gradient(#f12711, #f5af19);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            border: none;
+            padding: 15px 20px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .btn:active { transform: scale(0.95); }
+        .btn:hover { box-shadow: 0 8px 25px rgba(56, 239, 125, 0.6); }
+
+        .btn-alt {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
+        }
+        
+        .btn-locked {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            box-shadow: none;
+            cursor: not-allowed;
+            border: 1px dashed rgba(255,255,255,0.3);
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #1f1c2c;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader {
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid #f5af19;
+            border-radius: 50%;
+            width: 60px; height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .creator-text {
+            font-size: 1rem;
+            color: #ccc;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
         .hidden { display: none !important; }
-        .header-info { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
-        .main-question { font-size: 4rem; font-weight: 800; margin: 15px 0; text-shadow: 0 0 15px rgba(255,255,255,0.4); }
-        .zone-question { font-size: 2.2rem; font-weight: 800; margin: 10px 0; }
-        .options-container { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .col-options { flex-direction: column; }
-        .option-btn { flex: 1; padding: 15px 5px; font-size: 1.4rem; font-weight: bold; border-radius: 12px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.3); color: white; cursor: pointer; transition: all 0.2s; }
-        .option-btn:active { background: rgba(255, 255, 255, 0.3); transform: scale(0.95); }
-        .cooldown-active { opacity: 0.3; pointer-events: none; filter: blur(1px); }
-        .error-msg-box { color: #ff5e62; font-weight: bold; font-size: 1rem; margin-top: 10px; min-height: 24px; }
+
+        /* Game UI */
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 10px;
+        }
+
+        /* Soru Metinleri */
+        .main-question {
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 15px 0;
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .zone-question {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        /* Options Grid */
+        .options-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        /* 1v1 modu için butonları alt alta diz ki mobilde ekrana sığsın */
+        .col-options {
+            flex-direction: column; 
+        }
+
+        .option-btn {
+            flex: 1;
+            padding: 15px 5px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+
+        /* Cooldown State */
+        .cooldown-active {
+            opacity: 0.3;
+            pointer-events: none;
+            filter: blur(1px);
+        }
+
+        /* Error Text */
+        .error-msg-box {
+            color: #ff5e62;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-top: 10px;
+            min-height: 24px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255, 94, 98, 0.4);
+        }
+
         .shake-effect { animation: shake 0.3s ease-in-out; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
-        .player-zones { display: flex; flex-direction: row; gap: 15px; width: 100%; }
-        .player-zone { flex: 1; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        .p1-title { color: #00d2ff; } .p2-title { color: #f5af19; }
-        #timer { color: #ff5e62; font-size: 1.5rem; font-weight: 800; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        /* YAN YANA (Side-by-Side) Düzen */
+        .player-zones {
+            display: flex;
+            flex-direction: row; /* Yan Yana Yapan Kod */
+            gap: 15px;
+            width: 100%;
+        }
+
+        .player-zone {
+            flex: 1; /* Eşit şekilde bölüşürler */
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .p1-title { color: #00d2ff; font-size: 1.1rem; margin-bottom: 5px;}
+        .p2-title { color: #f5af19; font-size: 1.1rem; margin-bottom: 5px;}
+
+        .p1-btn { border-color: rgba(0, 210, 255, 0.3); }
+        .p2-btn { border-color: rgba(245, 175, 25, 0.3); }
+
+        #timer {
+            color: #ff5e62;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .glass-panel { padding: 15px; width: 98%; }
+            .main-question { font-size: 3rem; }
+            .zone-question { font-size: 1.8rem; }
+            .player-zone { padding: 10px; }
+            .option-btn { font-size: 1.2rem; padding: 10px 5px; }
+            .p1-title, .p2-title { font-size: 0.9rem; }
+            .player-zones { gap: 10px; }
+        }
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
-        <div class="progress-container"><div id="progress-bar"></div></div>
-        <div class="creator-text">Bilal Cantekin tarafından yapıldı (<span id="perc">0%</span>)</div>
+        <div class="loader"></div>
+        <div class="creator-text">Bilal Bera Cantekin tarafından yapıldı</div>
     </div>
 
     <div id="main-menu" class="glass-panel hidden">
         <h1>Mega Oyun Portalı</h1>
+        <p style="margin-bottom: 20px; color: #ddd;">Oynamak istediğin oyunu seç</p>
+        
         <button class="btn" onclick="showModeSelection()">✖️ Matematik Yarışı</button>
+        <button class="btn btn-locked">🔒 Yeni Oyun (Yakında)</button>
         <button class="btn btn-locked">🔒 Yeni Oyun (Yakında)</button>
     </div>
 
     <div id="mode-selection" class="glass-panel hidden">
         <h1>Matematik Yarışı</h1>
-        <button class="btn btn-alt" onclick="startGame('single')">👤 Tek Oyuncu</button>
-        <button class="btn" onclick="startGame('1v1')">⚔️ 1v1 (Yan Yana)</button>
-        <button class="btn" style="background: transparent; border: 1px solid #fff;" onclick="goBack()">Menüye Dön</button>
+        <p style="margin-bottom: 20px; color: #ddd;">Mod Seçimi</p>
+        <center>
+            <button class="btn btn-alt" onclick="startGame('single')">👤 Tek Oyuncu</button>
+            <button class="btn" onclick="startGame('1v1')">⚔️ 1v1 (Yan Yana)</button>
+            <button class="btn" style="background: transparent; border: 1px solid #fff; box-shadow: none; margin-top: 20px;" onclick="goBack()">Menüye Dön</button>
+        </center>
     </div>
 
     <div id="game-screen" class="glass-panel hidden">
-        <div class="header-info"><span id="score-display">Puan: 0</span><span id="timer">100s</span></div>
+        <div class="header-info">
+            <span id="score-display">Puan: 0</span>
+            <span id="timer">100s</span>
+        </div>
+        
         <div id="single-player-area" class="hidden">
             <div class="main-question" id="single-question">? x ?</div>
             <div class="options-container" id="single-options"></div>
             <div id="single-error" class="error-msg-box"></div>
         </div>
+
         <div id="1v1-player-area" class="player-zones hidden">
-            <div class="player-zone"><h3 class="p1-title">Oyuncu 1</h3><div class="zone-question" id="p1-question">? x ?</div><div class="options-container col-options" id="p1-options"></div><div id="p1-error" class="error-msg-box"></div></div>
-            <div class="player-zone"><h3 class="p2-title">Oyuncu 2</h3><div class="zone-question" id="p2-question">? x ?</div><div class="options-container col-options" id="p2-options"></div><div id="p2-error" class="error-msg-box"></div></div>
+            <div class="player-zone">
+                <h3 class="p1-title">Oyuncu 1</h3>
+                <div class="zone-question" id="p1-question">? x ?</div>
+                <div class="options-container col-options" id="p1-options"></div>
+                <div id="p1-error" class="error-msg-box"></div>
+            </div>
+            <div class="player-zone">
+                <h3 class="p2-title">Oyuncu 2</h3>
+                <div class="zone-question" id="p2-question">? x ?</div>
+                <div class="options-container col-options" id="p2-options"></div>
+                <div id="p2-error" class="error-msg-box"></div>
+            </div>
         </div>
     </div>
 
     <div id="result-screen" class="glass-panel hidden">
         <h1>Süre Doldu!</h1>
-        <h2 id="final-result-text" style="font-size: 2.5rem;">Skor</h2>
+        <h2 id="final-result-text" style="font-size: 2.5rem; margin: 15px 0;">Skor</h2>
+        <p id="winner-text" style="font-size: 1.2rem; margin-bottom: 25px; color: #ddd;"></p>
         <button class="btn btn-alt" onclick="showMainMenu()">Ana Menüye Dön</button>
     </div>
 
     <script>
-        // Yükleme Barı Mantığı
-        let progress = 0;
-        let loadInterval = setInterval(() => {
-            progress++;
-            document.getElementById('progress-bar').style.width = progress + '%';
-            document.getElementById('perc').innerText = progress + '%';
-            if (progress >= 100) {
-                clearInterval(loadInterval);
+        // Yükleme Ekranı
+        window.onload = () => {
+            setTimeout(() => {
                 document.getElementById('loading-screen').style.opacity = '0';
-                setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; document.getElementById('main-menu').classList.remove('hidden'); }, 500);
-            }
-        }, 30);
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('main-menu').classList.remove('hidden');
+                }, 500);
+            }, 2000);
+        };
 
-        // Oyun fonksiyonların aynı kalıyor...
-        let currentMode = 'single', timeLeft = 100, timerInterval, p1Score = 0, p2Score = 0, singleCorrect, p1Correct, p2Correct, p1ConsecutiveErrors = 0, p2ConsecutiveErrors = 0, p1InCooldown = false, p2InCooldown = false;
-
-        function showModeSelection() { document.getElementById('main-menu').classList.add('hidden'); document.getElementById('mode-selection').classList.remove('hidden'); }
-        function goBack() { document.getElementById('mode-selection').classList.add('hidden'); document.getElementById('main-menu').classList.remove('hidden'); }
-        function showMainMenu() { document.getElementById('result-screen').classList.add('hidden'); document.getElementById('main-menu').classList.remove('hidden'); }
+        let currentMode = 'single';
+        let timeLeft = 100;
+        let timerInterval;
         
-        function startGame(mode) {
-            currentMode = mode; p1Score = 0; p2Score = 0; timeLeft = 100;
-            document.getElementById('mode-selection').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            if(mode === 'single') { document.getElementById('single-player-area').classList.remove('hidden'); document.getElementById('1v1-player-area').classList.add('hidden'); generateQuestion('single'); }
-            else { document.getElementById('single-player-area').classList.add('hidden'); document.getElementById('1v1-player-area').classList.remove('hidden'); generateQuestion('p1'); generateQuestion('p2'); }
-            updateScoreDisplay(); startTimer();
+        let p1Score = 0;
+        let p2Score = 0;
+        
+        // Her oyuncunun kendi doğru cevabı olacak
+        let singleCorrect = 0;
+        let p1Correct = 0;
+        let p2Correct = 0;
+
+        let p1ConsecutiveErrors = 0;
+        let p2ConsecutiveErrors = 0;
+        let p1InCooldown = false;
+        let p2InCooldown = false;
+        let p1ErrorTimeout, p2ErrorTimeout;
+
+        function showModeSelection() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('mode-selection').classList.remove('hidden');
         }
 
+        function goBack() {
+            document.getElementById('mode-selection').classList.add('hidden');
+            document.getElementById('main-menu').classList.remove('hidden');
+        }
+
+        function showMainMenu() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('main-menu').classList.remove('hidden');
+        }
+
+        function startGame(mode) {
+            currentMode = mode;
+            p1Score = 0; p2Score = 0;
+            timeLeft = 100;
+            p1ConsecutiveErrors = 0; p2ConsecutiveErrors = 0;
+            p1InCooldown = false; p2InCooldown = false;
+            
+            document.getElementById('single-error').innerText = '';
+            document.getElementById('p1-error').innerText = '';
+            document.getElementById('p2-error').innerText = '';
+            document.getElementById('single-options').classList.remove('cooldown-active');
+            document.getElementById('p1-options').classList.remove('cooldown-active');
+            document.getElementById('p2-options').classList.remove('cooldown-active');
+
+            document.getElementById('mode-selection').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            if(mode === 'single') {
+                document.getElementById('single-player-area').classList.remove('hidden');
+                document.getElementById('1v1-player-area').classList.add('hidden');
+                generateQuestion('single');
+            } else {
+                document.getElementById('single-player-area').classList.add('hidden');
+                document.getElementById('1v1-player-area').classList.remove('hidden');
+                generateQuestion('p1');
+                generateQuestion('p2');
+            }
+
+            updateScoreDisplay();
+            startTimer();
+        }
+
+        // Oyuncuya Özel Soru Üretici
         function generateQuestion(player) {
-            let n1 = Math.floor(Math.random() * 10) + 1, n2 = Math.floor(Math.random() * 10) + 1, ans = n1 * n2;
-            let options = [ans, ans + 3, ans - 2].sort(() => Math.random() - 0.5);
-            if(player === 'single') { singleCorrect = ans; document.getElementById('single-question').innerText = n1+' x '+n2; renderButtons(options, 'single'); }
-            else if(player === 'p1') { p1Correct = ans; document.getElementById('p1-question').innerText = n1+' x '+n2; renderButtons(options, 'p1'); }
-            else { p2Correct = ans; document.getElementById('p2-question').innerText = n1+' x '+n2; renderButtons(options, 'p2'); }
+            let num1 = Math.floor(Math.random() * 10) + 1; 
+            let num2 = Math.floor(Math.random() * 10) + 1;
+            let correctAnswer = num1 * num2;
+            
+            let wrong1 = correctAnswer + (Math.floor(Math.random() * 8) + 1);
+            let wrong2 = correctAnswer - (Math.floor(Math.random() * 8) + 1);
+            if (wrong2 <= 0) wrong2 = correctAnswer + 12;
+            if (wrong1 === wrong2 || wrong1 === correctAnswer) wrong1 += 2;
+            if (wrong2 === correctAnswer) wrong2 += 3;
+
+            let options = [correctAnswer, wrong1, wrong2];
+            options.sort(() => Math.random() - 0.5); // Şıkları karıştır
+
+            if (player === 'single') {
+                singleCorrect = correctAnswer;
+                document.getElementById('single-question').innerText = `${num1} x ${num2}`;
+                renderButtons(options, 'single');
+            } else if (player === 'p1') {
+                p1Correct = correctAnswer;
+                document.getElementById('p1-question').innerText = `${num1} x ${num2}`;
+                renderButtons(options, 'p1');
+            } else if (player === 'p2') {
+                p2Correct = correctAnswer;
+                document.getElementById('p2-question').innerText = `${num1} x ${num2}`;
+                renderButtons(options, 'p2');
+            }
         }
 
         function renderButtons(options, player) {
-            let html = options.map(opt => `<button class="option-btn" onclick="checkAnswer(${opt}, '${player}')">${opt}</button>`).join('');
-            document.getElementById(player === 'single' ? 'single-options' : player + '-options').innerHTML = html;
+            let html = '';
+            if (player === 'single') {
+                options.forEach(opt => {
+                    html += `<button class="option-btn" onclick="checkAnswer(${opt}, 'single')">${opt}</button>`;
+                });
+                document.getElementById('single-options').innerHTML = html;
+            } else if (player === 'p1') {
+                options.forEach(opt => {
+                    html += `<button class="option-btn p1-btn" onclick="checkAnswer(${opt}, 'p1')">${opt}</button>`;
+                });
+                document.getElementById('p1-options').innerHTML = html;
+            } else if (player === 'p2') {
+                options.forEach(opt => {
+                    html += `<button class="option-btn p2-btn" onclick="checkAnswer(${opt}, 'p2')">${opt}</button>`;
+                });
+                document.getElementById('p2-options').innerHTML = html;
+            }
         }
 
-        function checkAnswer(selected, player) {
-            let correct = (player === 'single') ? singleCorrect : (player === 'p1' ? p1Correct : p2Correct);
-            if(selected === correct) {
-                if(player !== 'p2') p1Score += 10; else p2Score += 10;
-                generateQuestion(player);
-            } else {
-                triggerErrorFeedback(player);
+        function checkAnswer(selectedOption, player) {
+            if (player === 'single') {
+                if (selectedOption === singleCorrect) {
+                    p1Score += 10;
+                    p1ConsecutiveErrors = 0;
+                    animateCorrect('single-question');
+                    generateQuestion('single');
+                } else {
+                    p1ConsecutiveErrors++;
+                    triggerErrorFeedback('single');
+                }
+            } else if (player === 'p1') {
+                if (p1InCooldown) return;
+                if (selectedOption === p1Correct) {
+                    p1Score += 10;
+                    p1ConsecutiveErrors = 0;
+                    animateCorrect('p1-question');
+                    generateQuestion('p1'); // Sadece P1'in sorusunu yenile
+                } else {
+                    p1ConsecutiveErrors++;
+                    triggerErrorFeedback('p1');
+                }
+            } else if (player === 'p2') {
+                if (p2InCooldown) return;
+                if (selectedOption === p2Correct) {
+                    p2Score += 10;
+                    p2ConsecutiveErrors = 0;
+                    animateCorrect('p2-question');
+                    generateQuestion('p2'); // Sadece P2'nin sorusunu yenile
+                } else {
+                    p2ConsecutiveErrors++;
+                    triggerErrorFeedback('p2');
+                }
             }
             updateScoreDisplay();
         }
 
-        function triggerErrorFeedback(player) {
-            let errBox = document.getElementById(player === 'single' ? 'single-error' : player + '-error');
-            errBox.innerText = "Hata!";
-            setTimeout(() => errBox.innerText = "", 1000);
+        // Doğru Cevap Yeşerme Efekti
+        function animateCorrect(elementId) {
+            let el = document.getElementById(elementId);
+            el.style.color = '#38ef7d';
+            setTimeout(() => { el.style.color = '#fff'; }, 300);
         }
 
-        function updateScoreDisplay() { document.getElementById('score-display').innerText = currentMode === 'single' ? `Puan: ${p1Score}` : `O1: ${p1Score} | O2: ${p2Score}`; }
-        function startTimer() { timerInterval = setInterval(() => { timeLeft--; document.getElementById('timer').innerText = timeLeft + 's'; if(timeLeft <= 0) { clearInterval(timerInterval); endGame(); } }, 1000); }
-        function endGame() { document.getElementById('game-screen').classList.add('hidden'); document.getElementById('result-screen').classList.remove('hidden'); document.getElementById('final-result-text').innerText = currentMode === 'single' ? p1Score : p1Score + " - " + p2Score; }
+        // Hata Bildirimi ve Ceza Kontrolü
+        function triggerErrorFeedback(player) {
+            let errorBoxId = player === 'single' ? 'single-error' : `${player}-error`;
+            let optionsBoxId = player === 'single' ? 'single-options' : `${player}-options`;
+            
+            let errorBox = document.getElementById(errorBoxId);
+            let optionsBox = document.getElementById(optionsBoxId);
+            let currentErrCount = player === 'p2' ? p2ConsecutiveErrors : p1ConsecutiveErrors;
+
+            errorBox.classList.remove('shake-effect');
+            void errorBox.offsetWidth;
+            errorBox.classList.add('shake-effect');
+
+            if (currentErrCount >= 3) {
+                if (player === 'single' || player === 'p1') p1InCooldown = true;
+                if (player === 'p2') p2InCooldown = true;
+
+                optionsBox.classList.add('cooldown-active');
+                
+                let secondsLeft = 3;
+                errorBox.innerText = `🚨 3 Hata! ${secondsLeft}sn Bekle`;
+                errorBox.style.color = '#ff5e62';
+
+                let cooldownTimer = setInterval(() => {
+                    secondsLeft--;
+                    if (secondsLeft <= 0) {
+                        clearInterval(cooldownTimer);
+                        if (player === 'single' || player === 'p1') { p1InCooldown = false; p1ConsecutiveErrors = 0; }
+                        if (player === 'p2') { p2InCooldown = false; p2ConsecutiveErrors = 0; }
+                        optionsBox.classList.remove('cooldown-active');
+                        errorBox.innerText = '';
+                    } else {
+                        errorBox.innerText = `🚨 3 Hata! ${secondsLeft}sn Bekle`;
+                    }
+                }, 1000);
+
+            } else {
+                errorBox.innerText = '⚠️ Hata Yaptın!';
+                errorBox.style.color = '#ff9966';
+
+                if (player === 'single' || player === 'p1') {
+                    clearTimeout(p1ErrorTimeout);
+                    p1ErrorTimeout = setTimeout(() => { if(!p1InCooldown) errorBox.innerText = ''; }, 1200);
+                } else {
+                    clearTimeout(p2ErrorTimeout);
+                    p2ErrorTimeout = setTimeout(() => { if(!p2InCooldown) errorBox.innerText = ''; }, 1200);
+                }
+            }
+        }
+
+        function updateScoreDisplay() {
+            if (currentMode === 'single') {
+                document.getElementById('score-display').innerText = `Puan: ${p1Score}`;
+            } else {
+                document.getElementById('score-display').innerText = `O1: ${p1Score} | O2: ${p2Score}`;
+            }
+        }
+
+        function startTimer() {
+            document.getElementById('timer').innerText = `${timeLeft}s`;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = `${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            let finalResultText = document.getElementById('final-result-text');
+            let winnerText = document.getElementById('winner-text');
+
+            if (currentMode === 'single') {
+                finalResultText.innerText = `${p1Score} Puan`;
+                winnerText.innerText = "Harika antrenmandı!";
+            } else {
+                finalResultText.innerText = `${p1Score} - ${p2Score}`;
+                if (p1Score > p2Score) {
+                    winnerText.innerText = "🏆 Oyuncu 1 Kazandı!";
+                    winnerText.style.color = "#00d2ff";
+                } else if (p2Score > p1Score) {
+                    winnerText.innerText = "🏆 Oyuncu 2 Kazandı!";
+                    winnerText.style.color = "#f5af19";
+                } else {
+                    winnerText.innerText = "🤝 Berabere!";
+                    winnerText.style.color = "#fff";
+                }
+            }
+        }
     </script>
 </body>
 </html>
