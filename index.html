@@ -110,11 +110,37 @@
             margin-bottom: 20px;
         }
 
+        .progress-bar-container {
+            width: 200px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f5af19, #f12711);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: #f5af19;
+            margin-bottom: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
         .creator-text {
-            font-size: 1rem;
-            color: #ccc;
-            letter-spacing: 2px;
-            animation: pulse 2s infinite;
+            font-size: 0.75rem;
+            color: #888;
+            letter-spacing: 0.5px;
+            margin-top: 20px;
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -157,9 +183,15 @@
             justify-content: center;
             margin-top: 15px;
             transition: all 0.3s ease;
+            flex-wrap: wrap;
         }
 
-        /* 1v1 modu için butonları alt alta diz ki mobilde ekrana sığsın */
+        /* Yan yana butonlar */
+        .row-options {
+            flex-direction: row;
+        }
+
+        /* Dikey butonlar (1v1 için) */
         .col-options {
             flex-direction: column; 
         }
@@ -175,6 +207,7 @@
             color: white;
             cursor: pointer;
             transition: all 0.2s;
+            min-width: 80px;
         }
 
         .option-btn:active {
@@ -237,6 +270,37 @@
             font-weight: 800;
         }
 
+        /* Mode Selection Buttons Container */
+        .mode-buttons-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            flex: 1;
+            min-width: 150px;
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            border: none;
+            padding: 15px 20px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        .mode-btn:active { transform: scale(0.95); }
+        .mode-btn:hover { box-shadow: 0 8px 25px rgba(56, 239, 125, 0.6); }
+
+        .mode-btn-alt {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
+        }
+
         @media (max-width: 600px) {
             h1 { font-size: 1.8rem; }
             .glass-panel { padding: 15px; width: 98%; }
@@ -246,6 +310,8 @@
             .option-btn { font-size: 1.2rem; padding: 10px 5px; }
             .p1-title, .p2-title { font-size: 0.9rem; }
             .player-zones { gap: 10px; }
+            .mode-buttons-container { flex-direction: column; }
+            .mode-btn { min-width: 100%; }
         }
     </style>
 </head>
@@ -253,7 +319,11 @@
 
     <div id="loading-screen">
         <div class="loader"></div>
-        <div class="creator-text">Bilal Bera Cantekin tarafından yapıldı</div>
+        <div class="progress-text" id="progress-text">0%</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+        <div class="creator-text">Bilal Cantekin tarafından yapıldı</div>
     </div>
 
     <div id="main-menu" class="glass-panel hidden">
@@ -268,11 +338,11 @@
     <div id="mode-selection" class="glass-panel hidden">
         <h1>Matematik Yarışı</h1>
         <p style="margin-bottom: 20px; color: #ddd;">Mod Seçimi</p>
-        <center>
-            <button class="btn btn-alt" onclick="startGame('single')">👤 Tek Oyuncu</button>
-            <button class="btn" onclick="startGame('1v1')">⚔️ 1v1 (Yan Yana)</button>
-            <button class="btn" style="background: transparent; border: 1px solid #fff; box-shadow: none; margin-top: 20px;" onclick="goBack()">Menüye Dön</button>
-        </center>
+        <div class="mode-buttons-container">
+            <button class="mode-btn mode-btn-alt" onclick="startGame('single')">👤 Tek Oyuncu</button>
+            <button class="mode-btn" onclick="startGame('1v1')">⚔️ 1v1 (Yan Yana)</button>
+        </div>
+        <button class="btn" style="background: transparent; border: 1px solid #fff; box-shadow: none; margin-top: 20px;" onclick="goBack()">Menüye Dön</button>
     </div>
 
     <div id="game-screen" class="glass-panel hidden">
@@ -283,7 +353,7 @@
         
         <div id="single-player-area" class="hidden">
             <div class="main-question" id="single-question">? x ?</div>
-            <div class="options-container" id="single-options"></div>
+            <div class="options-container row-options" id="single-options"></div>
             <div id="single-error" class="error-msg-box"></div>
         </div>
 
@@ -307,18 +377,42 @@
         <h1>Süre Doldu!</h1>
         <h2 id="final-result-text" style="font-size: 2.5rem; margin: 15px 0;">Skor</h2>
         <p id="winner-text" style="font-size: 1.2rem; margin-bottom: 25px; color: #ddd;"></p>
-        <button class="btn btn-alt" onclick="showMainMenu()">Ana Menüye Dön</button>
+        <button class="btn mode-btn-alt" onclick="showMainMenu()">Ana Menüye Dön</button>
     </div>
 
     <script>
-        // Yükleme Ekranı
+        // Yükleme Ekranı ve İlerleme Barı
+        let loadingProgress = 0;
+        let loadingInterval;
+
+        function updateLoadingProgress() {
+            loadingProgress += Math.random() * 30;
+            if (loadingProgress > 90) loadingProgress = 90;
+            
+            const progressBar = document.getElementById('progress-bar-fill');
+            const progressText = document.getElementById('progress-text');
+            
+            progressBar.style.width = loadingProgress + '%';
+            progressText.innerText = Math.floor(loadingProgress) + '%';
+        }
+
         window.onload = () => {
+            loadingInterval = setInterval(updateLoadingProgress, 300);
+            
             setTimeout(() => {
-                document.getElementById('loading-screen').style.opacity = '0';
+                loadingProgress = 100;
+                document.getElementById('progress-bar-fill').style.width = '100%';
+                document.getElementById('progress-text').innerText = '100%';
+                
+                clearInterval(loadingInterval);
+                
                 setTimeout(() => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                    document.getElementById('main-menu').classList.remove('hidden');
-                }, 500);
+                    document.getElementById('loading-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').style.display = 'none';
+                        document.getElementById('main-menu').classList.remove('hidden');
+                    }, 500);
+                }, 300);
             }, 2000);
         };
 
