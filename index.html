@@ -340,7 +340,7 @@
         <p style="margin-bottom: 20px; color: #ddd;">Mod Seçimi</p>
         <div class="mode-buttons-container">
             <button class="mode-btn mode-btn-alt" onclick="startGame('single')">👤 Tek Oyuncu</button>
-            <button class="mode-btn" onclick="startGame('1v1')">⚔️ 1v1 (Yan Yana)</button>
+            <button class="mode-btn" onclick="startGame('1v1')">⚔️ 2 Kişi (1v1)</button>
         </div>
         <button class="btn" style="background: transparent; border: 1px solid #fff; box-shadow: none; margin-top: 20px;" onclick="goBack()">Menüye Dön</button>
     </div>
@@ -353,7 +353,7 @@
         
         <div id="single-player-area" class="hidden">
             <div class="main-question" id="single-question">? x ?</div>
-            <div class="options-container row-options" id="single-options"></div>
+            <div class="options-container col-options" id="single-options"></div>
             <div id="single-error" class="error-msg-box"></div>
         </div>
 
@@ -381,6 +381,85 @@
     </div>
 
     <script>
+        // Ses Efektleri Oluşturma (Web Audio API ile dinamik sesler)
+        function createAudioContext() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            return audioContext;
+        }
+
+        // Ding Sesi (Doğru Cevap)
+        function playDingSound() {
+            try {
+                const audioContext = createAudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (e) {
+                console.log('Ses çalınamadı');
+            }
+        }
+
+        // Buzzer Sesi (Hata)
+        function playBuzzerSound() {
+            try {
+                const audioContext = createAudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 200;
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                console.log('Ses çalınamadı');
+            }
+        }
+
+        // Alkış Sesi (Oyun Bitişi)
+        function playApplauseSound() {
+            try {
+                const audioContext = createAudioContext();
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        
+                        osc.frequency.value = 400 + Math.random() * 200;
+                        osc.type = 'sine';
+                        
+                        gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                        
+                        osc.start(audioContext.currentTime);
+                        osc.stop(audioContext.currentTime + 0.1);
+                    }, i * 50);
+                }
+            } catch (e) {
+                console.log('Ses çalınamadı');
+            }
+        }
+
         // Yükleme Ekranı ve İlerleme Barı
         let loadingProgress = 0;
         let loadingInterval;
@@ -536,10 +615,12 @@
                 if (selectedOption === singleCorrect) {
                     p1Score += 10;
                     p1ConsecutiveErrors = 0;
+                    playDingSound();
                     animateCorrect('single-question');
                     generateQuestion('single');
                 } else {
                     p1ConsecutiveErrors++;
+                    playBuzzerSound();
                     triggerErrorFeedback('single');
                 }
             } else if (player === 'p1') {
@@ -547,10 +628,12 @@
                 if (selectedOption === p1Correct) {
                     p1Score += 10;
                     p1ConsecutiveErrors = 0;
+                    playDingSound();
                     animateCorrect('p1-question');
                     generateQuestion('p1'); // Sadece P1'in sorusunu yenile
                 } else {
                     p1ConsecutiveErrors++;
+                    playBuzzerSound();
                     triggerErrorFeedback('p1');
                 }
             } else if (player === 'p2') {
@@ -558,10 +641,12 @@
                 if (selectedOption === p2Correct) {
                     p2Score += 10;
                     p2ConsecutiveErrors = 0;
+                    playDingSound();
                     animateCorrect('p2-question');
                     generateQuestion('p2'); // Sadece P2'nin sorusunu yenile
                 } else {
                     p2ConsecutiveErrors++;
+                    playBuzzerSound();
                     triggerErrorFeedback('p2');
                 }
             }
@@ -648,6 +733,7 @@
         }
 
         function endGame() {
+            playApplauseSound();
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
 
